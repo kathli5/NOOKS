@@ -9,8 +9,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 <body>
-    <h1>Welcome!</h1>
-    <p>Everything is fine.</p>
+    <h1>NOOKS</h1>
+
+    <%- include("partials/navbar.ejs") %>
 
     <div id="logged-in">
     <p>You are logged in as <span id="login-uid"><%= uid %></span>
@@ -25,12 +26,6 @@
     </div>
 
     <p>You have visited <%= visits %> times.</p>
-
-    <h2>Links</h2>
-
-    <p><a href="/form/">a pizza form</a></p>
-    
-    <p><a href="/staffList/">staff listing</a></p>
 
     <!-- load local js -->
     <script src="/main.js"></script>

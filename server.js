@@ -120,6 +120,16 @@ app.get('/staffList/', async (req, res) => {
     return res.render('list.ejs', {listDescription: 'all staff', list: all});
 });
 
+app.get('/map/', (req, res) => {
+    console.log('map view');
+    return res.render('map.ejs');
+});
+
+app.get('/profile/', (req, res) => {
+    console.log('profile page');
+    return res.render('profile.ejs');
+});
+
 // ================================================================
 // postlude
 
