@@ -9,35 +9,38 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 <body>
-    <h1>NOOKS</h1>
+    <h1>Welcome to NOOKS!</h1>
 
-    <%- include("partials/navbar.ejs") %>
+    <%- include("partials/flashes.ejs") %>
 
-    <div id="logged-in">
-    <p>You are logged in as <span id="login-uid"><%= uid %></span>
-        <form method="post" action="/logout/"><input type="submit" value="logout"></form></p>
-    </div>
-    <div id="not-logged-in">
-    <p>You are not logged in.</p>
-    <form id="login_form" method="post" action="/set-uid/">
-        <p><label>uid <input name="uid"></label></p>
-        <input type="button" id="login-ajax" value="ajax">
+<h2>Register:</h2>
+  <p>
+    <form action="/join" method="POST">
+        <label> Username
+            <input type="text" name="username" placeholder="og102">
+        </label>
+        <label> Password
+            <input type="text" name="password" placeholder="********">
+        </label>
+      <button type="submit">register</button>
     </form>
-    </div>
-
-    <p>You have visited <%= visits %> times.</p>
+  </p>
+  <h2>Login:</h2>
+  <p>
+    <form action="/login" method="POST">
+        <label> Username
+            <input type="text" name="username" placeholder="og102">
+        </label>
+        <label> Password
+            <input type="text" name="password" placeholder="********">
+        </label>
+      <button type="submit">login</button>
+    </form>
+  </p>
 
     <!-- load local js -->
     <script src="/main.js"></script>
     <script>
-        var uid = "<%= uid %>";
-        if(uid !== 'unknown') {
-            $("#logged-in").show();
-            $("#not-logged-in").hide();
-        } else {
-            $("#logged-in").hide();
-            $("#not-logged-in").show();
-        }
     </script>
 </body>
 </html>

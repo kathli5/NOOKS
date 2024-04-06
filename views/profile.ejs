@@ -12,7 +12,13 @@
 
     <%- include("partials/navbar.ejs") %>
 
-    <h1>PROFILE</h1>
+    <h1>PROFILE for <%= username %></h1>
+
+    <p>
+        <form action="/logout" method="POST">
+          <button>Logout <%= username %></button>
+        </form>
+    </p>
 
     <!-- load local js -->
     <script src="/main.js"></script>

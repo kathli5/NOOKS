@@ -15,6 +15,7 @@ const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 const flash = require('express-flash');
 const multer = require('multer');
+const bcrypt = require('bcrypt');
 
 // our modules loaded from cwd
 
@@ -46,10 +47,11 @@ const mongoUri = cs304.getMongoUri();
 app.use(cookieSession({
     name: 'session',
     keys: ['horsebattery'],
-
     // Cookie Options
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
 }));
+
+const ROUNDS = 10;
 
 // ================================================================
 // custom routes here
@@ -57,6 +59,8 @@ app.use(cookieSession({
 const DB = process.env.USER;
 const WMDB = 'wmdb';
 const STAFF = 'staff';
+const DBNAME = "bcrypt"; //change to our database 
+const USERS = "users"; //change to our users
 
 // main page. This shows the use of session cookies
 app.get('/', (req, res) => {
@@ -68,36 +72,76 @@ app.get('/', (req, res) => {
     return res.render('index.ejs', {uid, visits});
 });
 
-// shows how logins might work by setting a value in the session
-// This is a conventional, non-Ajax, login, so it redirects to main page 
-app.post('/set-uid/', (req, res) => {
-    console.log('in set-uid');
-    req.session.uid = req.body.uid;
-    req.session.logged_in = true;
-    res.redirect('/');
+// main page. This shows the use of session cookies
+app.get('/', (req, res) => {
+    return res.render('index.ejs', {uid, visits});
 });
 
-// shows how logins might work via Ajax
-app.post('/set-uid-ajax/', (req, res) => {
-    console.log(Object.keys(req.body));
-    console.log(req.body);
-    let uid = req.body.uid;
-    if(!uid) {
-        res.send({error: 'no uid'}, 400);
-        return;
+//LOGIN
+app.post("/join", async (req, res) => {
+    try {
+      const username = req.body.username;
+      const password = req.body.password;
+      const db = await Connection.open(mongoUri, DBNAME);
+      var existingUser = await db.collection(USERS).findOne({username: username});
+      if (existingUser) {
+        req.flash('error', "Login already exists - please try logging in instead.");
+        return res.redirect('/')
+      }
+      const hash = await bcrypt.hash(password, ROUNDS);
+      await db.collection(USERS).insertOne({
+          username: username,
+          hash: hash
+      });
+      console.log('successfully joined', username, password, hash);
+      req.flash('info', 'successfully joined and logged in as ' + username);
+      req.session.username = username;
+      req.session.loggedIn = true;
+      return res.redirect('/all');
+    } catch (error) {
+      req.flash('error', `Form submission error: ${error}`);
+      return res.redirect('/')
     }
-    req.session.uid = req.body.uid;
-    req.session.logged_in = true;
-    console.log('logged in via ajax as ', req.body.uid);
-    res.send({error: false});
+  });
+  
+app.post("/login", async (req, res) => {
+    try {
+      const username = req.body.username;
+      const password = req.body.password;
+      const db = await Connection.open(mongoUri, DBNAME);
+      var existingUser = await db.collection(USERS).findOne({username: username});
+      console.log('user', existingUser);
+      if (!existingUser) {
+        req.flash('error', "Username does not exist - try again.");
+       return res.redirect('/')
+      }
+      const match = await bcrypt.compare(password, existingUser.hash); 
+      console.log('match', match);
+      if (!match) {
+          req.flash('error', "Username or password incorrect - try again.");
+          return res.redirect('/')
+      }
+      req.flash('info', 'successfully logged in as ' + username);
+      req.session.username = username;
+      req.session.loggedIn = true;
+      console.log('login as', username);
+      return res.redirect('/all');
+    } catch (error) {
+      req.flash('error', `Form submission error: ${error}`);
+      return res.redirect('/')
+    }
 });
 
-// conventional non-Ajax logout, so redirects
-app.post('/logout/', (req, res) => {
-    console.log('in logout');
-    req.session.uid = false;
-    req.session.logged_in = false;
-    res.redirect('/');
+app.post('/logout', (req,res) => {
+    if (req.session.username) {
+      req.session.username = null;
+      req.session.loggedIn = false;
+      req.flash('info', 'You are logged out');
+      return res.redirect('/');
+    } else {
+      req.flash('error', 'You are not logged in - please do so.');
+      return res.redirect('/');
+    }
 });
 
 // two kinds of forms (GET and POST), both of which are pre-filled with data
@@ -113,13 +157,6 @@ app.post('/form/', (req, res) => {
     return res.render('form.ejs', {action: '/form/', data: req.body });
 });
 
-app.get('/staffList/', async (req, res) => {
-    const db = await Connection.open(mongoUri, WMDB);
-    let all = await db.collection(STAFF).find({}).sort({name: 1}).toArray();
-    console.log('len', all.length, 'first', all[0]);
-    return res.render('list.ejs', {listDescription: 'all staff', list: all});
-});
-
 app.get('/map/', (req, res) => {
     console.log('map view');
     return res.render('map.ejs');
@@ -127,7 +164,16 @@ app.get('/map/', (req, res) => {
 
 app.get('/profile/', (req, res) => {
     console.log('profile page');
-    return res.render('profile.ejs');
+    return res.render('profile.ejs', {username: req.session.username});
+});
+
+//all nooks (currently looking at staff of wmdb, NEED TO CHANGE TO NOOKS)
+app.get('/all/', async (req, res) => {
+    const db = await Connection.open(mongoUri, WMDB);
+    let all = await db.collection(STAFF).find({}).sort({name: 1}).toArray();
+    console.log('len', all.length, 'first', all[0]);
+    console.log('all nooks');
+    return res.render('list.ejs', {listDescription: 'All Nooks', list: all});
 });
 
 // ================================================================
