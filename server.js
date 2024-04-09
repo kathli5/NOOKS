@@ -59,7 +59,8 @@ const ROUNDS = 10;
 const DB = process.env.USER;
 const WMDB = 'wmdb';
 const STAFF = 'staff';
-const DBNAME = "bcrypt"; //change to our database 
+const DBNAME = "nooks_db"; //change to our database 
+const NOOKS = "nooks";
 const USERS = "users"; //change to our users
 
 // main page. This shows the use of session cookies
@@ -147,14 +148,26 @@ app.post('/logout', (req,res) => {
 // two kinds of forms (GET and POST), both of which are pre-filled with data
 // from previous request, including a SELECT menu. Everything but radio buttons
 
-app.get('/form/', (req, res) => {
-    console.log('get form');
-    return res.render('form.ejs', {action: '/form/', data: req.query });
+app.get('/search/', (req, res) => {
+    console.log('get search form');
+    return res.render('search.ejs', {action: '/search/', data: req.query });
 });
 
-app.post('/form/', (req, res) => {
-    console.log('post form');
-    return res.render('form.ejs', {action: '/form/', data: req.body });
+app.get('/results/', async (req, res) => {
+    console.log('search form results');
+    let title = req.query.title;
+    let wifi = req.query.wifi;
+    let food = req.query.food;
+    let location = req.query.location;
+    let noise = req.query.noise;
+    console.log(wifi, location)
+    let searchTags = [wifi, food, location, noise].filter(tag => tag != null && tag !== '' && tag!= 'undefined');
+    console.log(searchTags);
+    const db = await Connection.open(mongoUri, NOOKS);
+    const nooks = db.collection(NOOKS);
+    let results = await nooks.find({ tags: { $all: searchTags } }).toArray(); 
+    console.log(results);
+    return res.render('results.ejs', { results:results});
 });
 
 app.get('/map/', (req, res) => {

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Lookup App</title>
+    <!-- load local stylesheet (css) -->
+    <link rel="stylesheet" href="/styles.css" />
+    <!-- loading jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+
+
+    <h1> Search Results </h1>
+
+    <ol>
+        <% results.forEach((elt) => {%>
+        <li><%= elt.tags.address %></li>
+        <% }); %>
+    </ol>
+
+    <!-- load local js -->
+    <script src="/main.js"></script>
+</body>
+</html>
