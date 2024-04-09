@@ -163,8 +163,10 @@ app.get('/results/', async (req, res) => {
     console.log(wifi, location)
     let searchTags = [wifi, food, location, noise].filter(tag => tag != null && tag !== '' && tag!= 'undefined');
     console.log(searchTags);
-    const db = await Connection.open(mongoUri, NOOKS);
+    console.log('Connecting to MongoDB:', mongoUri);
+    const db = await Connection.open(mongoUri, DBNAME);
     const nooks = db.collection(NOOKS);
+    console.log('Connected to MongoDB');
     let results = await nooks.find({ tags: { $all: searchTags } }).toArray(); 
     console.log(results);
     return res.render('results.ejs', { results:results});

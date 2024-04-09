@@ -10,12 +10,12 @@
 </head>
 <body>
 
-
+    <%- include("partials/navbar.ejs") %>
     <h1> Search Results </h1>
 
     <ol>
         <% results.forEach((elt) => {%>
-        <li><%= elt.tags.address %></li>
+        <li><%= elt.address %></li>
         <% }); %>
     </ol>
 
