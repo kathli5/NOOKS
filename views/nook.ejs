@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>
+    <%=address%>
+  </title>
+  <!-- load local stylesheet (css) -->
+  <link rel="stylesheet" href="../public/styles.css" />
+  <!-- loading jquery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+
+<body>
+  <%- include("partials/navbar.ejs") %>
+
+    <h1>
+      <%= address %>
+    </h1>
+    <p>Posted by <%= poster %></p>
+    <h2>Rating:</h2>
+    <span><%= rating %></span>
+    <h2>Tags:</h2>
+    <ul>
+      <% tags.forEach(elt=> { %>
+        <li><%=elt%></li>
+      <% }) %>
+    </ul>
+    <h2>Reviews:</h2>
+    <ul>
+      <% reviews.forEach(elt=> { %>
+        <li><%=elt%></li>
+      <% }) %>
+    </ul>
+     <h2>Photos:</h2> 
+      <img class="nook_photos" src="<%= photos %>" alt="Photo of <%= address %>" />
+      
+
+</body>
+
+</html>
