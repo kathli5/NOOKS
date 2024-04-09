@@ -7,7 +7,7 @@
 
 // standard modules, loaded from node_modules
 const path = require('path');
-require("dotenv").config({ path: path.join(process.env.HOME, '.cs304env')});
+require("dotenv").config({ path: path.join(process.env.HOME, '.cs304env') });
 const express = require('express');
 const morgan = require('morgan');
 const serveStatic = require('serve-static');
@@ -70,78 +70,78 @@ app.get('/', (req, res) => {
     visits++;
     req.session.visits = visits;
     console.log('uid', uid);
-    return res.render('index.ejs', {uid, visits});
+    return res.render('index.ejs', { uid, visits });
 });
 
 // main page. This shows the use of session cookies
 app.get('/', (req, res) => {
-    return res.render('index.ejs', {uid, visits});
+    return res.render('index.ejs', { uid, visits });
 });
 
 //LOGIN
 app.post("/join", async (req, res) => {
     try {
-      const username = req.body.username;
-      const password = req.body.password;
-      const db = await Connection.open(mongoUri, DBNAME);
-      var existingUser = await db.collection(USERS).findOne({username: username});
-      if (existingUser) {
-        req.flash('error', "Login already exists - please try logging in instead.");
+        const username = req.body.username;
+        const password = req.body.password;
+        const db = await Connection.open(mongoUri, DBNAME);
+        var existingUser = await db.collection(USERS).findOne({ username: username });
+        if (existingUser) {
+            req.flash('error', "Login already exists - please try logging in instead.");
+            return res.redirect('/')
+        }
+        const hash = await bcrypt.hash(password, ROUNDS);
+        await db.collection(USERS).insertOne({
+            username: username,
+            hash: hash
+        });
+        console.log('successfully joined', username, password, hash);
+        req.flash('info', 'successfully joined and logged in as ' + username);
+        req.session.username = username;
+        req.session.loggedIn = true;
+        return res.redirect('/all');
+    } catch (error) {
+        req.flash('error', `Form submission error: ${error}`);
         return res.redirect('/')
-      }
-      const hash = await bcrypt.hash(password, ROUNDS);
-      await db.collection(USERS).insertOne({
-          username: username,
-          hash: hash
-      });
-      console.log('successfully joined', username, password, hash);
-      req.flash('info', 'successfully joined and logged in as ' + username);
-      req.session.username = username;
-      req.session.loggedIn = true;
-      return res.redirect('/all');
-    } catch (error) {
-      req.flash('error', `Form submission error: ${error}`);
-      return res.redirect('/')
-    }
-  });
-  
-app.post("/login", async (req, res) => {
-    try {
-      const username = req.body.username;
-      const password = req.body.password;
-      const db = await Connection.open(mongoUri, DBNAME);
-      var existingUser = await db.collection(USERS).findOne({username: username});
-      console.log('user', existingUser);
-      if (!existingUser) {
-        req.flash('error', "Username does not exist - try again.");
-       return res.redirect('/')
-      }
-      const match = await bcrypt.compare(password, existingUser.hash); 
-      console.log('match', match);
-      if (!match) {
-          req.flash('error', "Username or password incorrect - try again.");
-          return res.redirect('/')
-      }
-      req.flash('info', 'successfully logged in as ' + username);
-      req.session.username = username;
-      req.session.loggedIn = true;
-      console.log('login as', username);
-      return res.redirect('/all');
-    } catch (error) {
-      req.flash('error', `Form submission error: ${error}`);
-      return res.redirect('/')
     }
 });
 
-app.post('/logout', (req,res) => {
+app.post("/login", async (req, res) => {
+    try {
+        const username = req.body.username;
+        const password = req.body.password;
+        const db = await Connection.open(mongoUri, DBNAME);
+        var existingUser = await db.collection(USERS).findOne({ username: username });
+        console.log('user', existingUser);
+        if (!existingUser) {
+            req.flash('error', "Username does not exist - try again.");
+            return res.redirect('/')
+        }
+        const match = await bcrypt.compare(password, existingUser.hash);
+        console.log('match', match);
+        if (!match) {
+            req.flash('error', "Username or password incorrect - try again.");
+            return res.redirect('/')
+        }
+        req.flash('info', 'successfully logged in as ' + username);
+        req.session.username = username;
+        req.session.loggedIn = true;
+        console.log('login as', username);
+        return res.redirect('/all');
+    } catch (error) {
+        req.flash('error', `Form submission error: ${error}`);
+        return res.redirect('/')
+    }
+});
+
+app.post('/logout', (req, res) => {
     if (req.session.username) {
-      req.session.username = null;
-      req.session.loggedIn = false;
-      req.flash('info', 'You are logged out');
-      return res.redirect('/');
+        req.session.username = null;
+        req.session.loggedIn = false;
+        req.flash('info', 'You are logged out');
+        return res.redirect('/');
     } else {
-      req.flash('error', 'You are not logged in - please do so.');
-      return res.redirect('/');
+        req.flash('error', 'You are not logged in - please do so.');
+        return res.redirect('/');
     }
 });
 
@@ -150,7 +150,7 @@ app.post('/logout', (req,res) => {
 
 app.get('/search/', (req, res) => {
     console.log('get search form');
-    return res.render('search.ejs', {action: '/search/', data: req.query });
+    return res.render('search.ejs', { action: '/search/', data: req.query });
 });
 
 app.get('/results/', async (req, res) => {
@@ -161,15 +161,43 @@ app.get('/results/', async (req, res) => {
     let location = req.query.location;
     let noise = req.query.noise;
     console.log(wifi, location)
-    let searchTags = [wifi, food, location, noise].filter(tag => tag != null && tag !== '' && tag!= 'undefined');
+    let searchTags = [wifi, food, location, noise].filter(tag => tag != null && tag !== '' && tag != 'undefined');
     console.log(searchTags);
     console.log('Connecting to MongoDB:', mongoUri);
     const db = await Connection.open(mongoUri, DBNAME);
     const nooks = db.collection(NOOKS);
     console.log('Connected to MongoDB');
-    let results = await nooks.find({ tags: { $all: searchTags } }).toArray(); 
+    let results = await nooks.find({ tags: { $all: searchTags } }).toArray();
     console.log(results);
-    return res.render('results.ejs', { results:results});
+    return res.render('results.ejs', { results: results });
+});
+
+app.get('/nook/:nookID', async (req, res) => {
+    let nookID = req.params.nookID;
+    nookID = Number(nookID);
+
+    // Database definitions
+    const db = await Connection.open(mongoUri, DBNAME);
+    const nooks = db.collection(NOOKS);
+
+    // Search database for chosen movie and bring it out of array
+    let chosen = await nooks.find({ nid: { $eq: nookID } }).toArray();
+    let nook = chosen[0];
+
+    if (nook) {
+        return res.render('nook.ejs',
+        {
+            rating: nook.rating,
+            poster: nook.poster,
+            tags: nook.tags,
+            reviews: nook.reviews,
+            address: nook.address,
+            photos: nook.photos
+        });
+    } else {
+        req.flash('error', 'This nook does not exist.')
+        res.redirect('/');
+    }
 });
 
 app.get('/map/', (req, res) => {
@@ -179,16 +207,16 @@ app.get('/map/', (req, res) => {
 
 app.get('/profile/', (req, res) => {
     console.log('profile page');
-    return res.render('profile.ejs', {username: req.session.username});
+    return res.render('profile.ejs', { username: req.session.username });
 });
 
 //all nooks (currently looking at staff of wmdb, NEED TO CHANGE TO NOOKS)
 app.get('/all/', async (req, res) => {
     const db = await Connection.open(mongoUri, WMDB);
-    let all = await db.collection(STAFF).find({}).sort({name: 1}).toArray();
+    let all = await db.collection(STAFF).find({}).sort({ name: 1 }).toArray();
     console.log('len', all.length, 'first', all[0]);
     console.log('all nooks');
-    return res.render('list.ejs', {listDescription: 'All Nooks', list: all});
+    return res.render('list.ejs', { listDescription: 'All Nooks', list: all });
 });
 
 // ================================================================
@@ -197,6 +225,6 @@ app.get('/all/', async (req, res) => {
 const serverPort = cs304.getPort(8080);
 
 // this is last, because it never returns
-app.listen(serverPort, function() {
+app.listen(serverPort, function () {
     console.log(`open http://localhost:${serverPort}`);
 });
