@@ -149,6 +149,11 @@ app.post('/logout', (req, res) => {
 // from previous request, including a SELECT menu. Everything but radio buttons
 
 app.get('/search/', async (req, res) => {
+    console.log('get search form');
+    if (!req.session.username) {
+        req.flash('error', 'You are not logged in - please do so.');
+        return res.redirect("/");
+    }
     let nookName = req.query.title;
     let wifiTag = req.query.wifi;
     let foodTag = req.query.food;
@@ -164,11 +169,17 @@ app.get('/search/', async (req, res) => {
     )
 
     await Connection.close();
+
+
     return res.render('search.ejs', { action: '/search/', data: req.query });
 });
 
 app.get('/results/', async (req, res) => {
     console.log('search form results');
+    if (!req.session.username) {
+        req.flash('error', 'You are not logged in - please do so.');
+        return res.redirect("/");
+    }
     let title = req.query.title;
     let wifi = req.query.wifi;
     let food = req.query.food;
@@ -188,6 +199,10 @@ app.get('/results/', async (req, res) => {
 });
 
 app.get('/nook/:nookID', async (req, res) => {
+    if (!req.session.username) {
+        req.flash('error', 'You are not logged in - please do so.');
+        return res.redirect("/");
+    }
     let nookID = req.params.nookID;
     nookID = Number(nookID);
 
@@ -216,20 +231,31 @@ app.get('/nook/:nookID', async (req, res) => {
 });
 
 app.get('/map/', (req, res) => {
+    if (!req.session.username) {
+        req.flash('error', 'You are not logged in - please do so.');
+        return res.redirect("/");
+    }
     console.log('map view');
     return res.render('map.ejs');
 });
 
 app.get('/profile/', (req, res) => {
+    if (!req.session.username) {
+        req.flash('error', 'You are not logged in - please do so.');
+        return res.redirect("/");
+    }
     console.log('profile page');
     return res.render('profile.ejs', { username: req.session.username });
 });
 
 //all nooks (currently looking at staff of wmdb, NEED TO CHANGE TO NOOKS)
 app.get('/all/', async (req, res) => {
+        if (!req.session.username) {
+        req.flash('error', 'You are not logged in - please do so.');
+        return res.redirect("/");
+    }
     const db = await Connection.open(mongoUri, DBNAME);
     const nooks = await db.collection(NOOKS);
-    //let all = await db.collection(STAFF).find({}).sort({ name: 1 }).toArray();
     let all = await nooks.find({}).sort({name: 1}).toArray();
     console.log('len', all.length, 'first', all[0]);
     console.log('all nooks');
