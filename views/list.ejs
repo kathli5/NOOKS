@@ -15,7 +15,7 @@
 
     <ol>
         <% list.forEach( (elt) => {%>
-        <li><%= elt.name %></li>
+        <li><a href="/nook/<%=elt.nid%>"><%= elt.name %></a></li>
         <% }); %>
     </ol>
     <!-- load local js -->

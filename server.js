@@ -148,8 +148,22 @@ app.post('/logout', (req, res) => {
 // two kinds of forms (GET and POST), both of which are pre-filled with data
 // from previous request, including a SELECT menu. Everything but radio buttons
 
-app.get('/search/', (req, res) => {
-    console.log('get search form');
+app.get('/search/', async (req, res) => {
+    let nookName = req.query.title;
+    let wifiTag = req.query.wifi;
+    let foodTag = req.query.food;
+    let outletTag = req.query.outlets;
+
+    console.log('You submitted a search with this name: ' + nookName);
+    console.log('You submitted a search with the following tags: ' + 
+    wifiTag, foodTag, outletTag);
+    const db = await Connection.open(mongoUri, DBNAME);
+    let searchResults = await db.collections(NOOKS).find(
+        {$or: [{name: {'$regex': nookName, '$options': 'gi'}},
+        {}]}
+    )
+
+    await Connection.close();
     return res.render('search.ejs', { action: '/search/', data: req.query });
 });
 
@@ -169,6 +183,7 @@ app.get('/results/', async (req, res) => {
     console.log('Connected to MongoDB');
     let results = await nooks.find({ tags: { $all: searchTags } }).toArray();
     console.log(results);
+    await Connection.close();
     return res.render('results.ejs', { results: results });
 });
 
@@ -212,11 +227,14 @@ app.get('/profile/', (req, res) => {
 
 //all nooks (currently looking at staff of wmdb, NEED TO CHANGE TO NOOKS)
 app.get('/all/', async (req, res) => {
-    const db = await Connection.open(mongoUri, WMDB);
-    let all = await db.collection(STAFF).find({}).sort({ name: 1 }).toArray();
+    const db = await Connection.open(mongoUri, DBNAME);
+    const nooks = await db.collection(NOOKS);
+    //let all = await db.collection(STAFF).find({}).sort({ name: 1 }).toArray();
+    let all = await nooks.find({}).sort({name: 1}).toArray();
     console.log('len', all.length, 'first', all[0]);
     console.log('all nooks');
-    return res.render('list.ejs', { listDescription: 'All Nooks', list: all });
+    await Connection.close();
+    return res.render('list.ejs', { listDescription: 'All Nooks', list: all});
 });
 
 // ================================================================
