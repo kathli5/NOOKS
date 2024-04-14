@@ -163,13 +163,12 @@ app.get('/search/', async (req, res) => {
     console.log('You submitted a search with the following tags: ' + 
     wifiTag, foodTag, outletTag);
     const db = await Connection.open(mongoUri, DBNAME);
-    let searchResults = await db.collections(NOOKS).find(
+    let searchResults = await db.collection(NOOKS).find(
         {$or: [{name: {'$regex': nookName, '$options': 'gi'}},
         {}]}
     )
 
     await Connection.close();
-
 
     return res.render('search.ejs', { action: '/search/', data: req.query });
 });
@@ -248,7 +247,7 @@ app.get('/profile/', (req, res) => {
     return res.render('profile.ejs', { username: req.session.username });
 });
 
-//all nooks (currently looking at staff of wmdb, NEED TO CHANGE TO NOOKS)
+//all nooks 
 app.get('/all/', async (req, res) => {
         if (!req.session.username) {
         req.flash('error', 'You are not logged in - please do so.');
