@@ -14,6 +14,7 @@
 
 <body>
   <%- include("partials/navbar.ejs") %>
+  <%- include("partials/flashes.ejs") %>
 
     <h1>
       <%= address %>
@@ -36,7 +37,9 @@
      <h2>Photos:</h2> 
       <img class="nook_photos" src="<%= photos %>" alt="Photo of <%= address %>" />
       
-
+    <form method="GET" action="/get-review">
+    <p><button name="nid" id="nid" value="<%= nook.nid %>">Add Review</button></p>
+    </form>
 </body>
 
 </html>

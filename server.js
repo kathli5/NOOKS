@@ -216,6 +216,7 @@ app.get('/nook/:nookID', async (req, res) => {
     if (nook) {
         return res.render('nook.ejs',
         {
+            nook:nook,
             rating: nook.rating,
             poster: nook.poster,
             tags: nook.tags,
@@ -228,6 +229,39 @@ app.get('/nook/:nookID', async (req, res) => {
         res.redirect('/');
     }
 });
+
+//review page of the selected nook
+app.get('/review/:nookID', async (req, res) => {
+    if (!req.session.username) {
+        req.flash('error', 'You are not logged in - please do so.');
+        return res.redirect("/");
+    }
+    let nookID = req.params.nookID;
+    nookID = Number(nookID);
+
+    // Search database for chosen movie and bring it out of array
+    const db = await Connection.open(mongoUri, DBNAME);
+    const nooks = db.collection(NOOKS);
+    let chosen = await nooks.find({ nid: { $eq: nookID } }).toArray();
+    let nook = chosen[0];
+
+    if (nook) {
+        return res.render('review.ejs',
+        {
+            nook: nook,
+        });
+    } else {
+        req.flash('error', 'This nook does not exist.')
+        res.redirect('/');
+    }
+})
+
+// redirects you to the review page of the selected nook
+app.get('/get-review/', async (req, res) => {
+    let nid = parseInt(req.query.nid);
+    console.log(nid);
+    return res.redirect(`/review/${nid}`);
+})
 
 app.get('/map/', (req, res) => {
     if (!req.session.username) {
