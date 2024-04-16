@@ -59,9 +59,9 @@ const ROUNDS = 10;
 const DB = process.env.USER;
 const WMDB = 'wmdb';
 const STAFF = 'staff';
-const DBNAME = "nooks_db"; //change to our database 
+const DBNAME = "nooks_db"; 
 const NOOKS = "nooks";
-const USERS = "users"; //change to our users
+const USERS = "users"; 
 
 // main page. This shows the use of session cookies
 app.get('/', (req, res) => {
@@ -244,7 +244,6 @@ app.get('/review/:nookID', async (req, res) => {
     const nooks = db.collection(NOOKS);
     let chosen = await nooks.find({ nid: { $eq: nookID } }).toArray();
     let nook = chosen[0];
-
     if (nook) {
         return res.render('review.ejs',
         {
@@ -254,7 +253,49 @@ app.get('/review/:nookID', async (req, res) => {
         req.flash('error', 'This nook does not exist.')
         res.redirect('/');
     }
-})
+});
+
+//post method for inserting review of nook
+app.post('/review/:nookID', async (req, res) => {
+    if (!req.session.username) {
+        req.flash('error', 'You are not logged in - please do so.');
+        return res.redirect("/");
+    }
+    let nookID = req.params.nookID;
+    nookID = Number(nookID);
+
+    // Search database for chosen movie and bring it out of array
+    const db = await Connection.open(mongoUri, DBNAME);
+    const nooks = db.collection(NOOKS);
+    let chosen = await nooks.find({ nid: { $eq: nookID } }).toArray();
+    let nook = chosen[0];
+
+    if (!nook) {
+        req.flash('error', 'This nook does not exist.')
+        return res.redirect('/');
+    }
+
+    //add review to database
+    //TODO: figure out counter for reviewID
+    let review = {
+        username: req.session.username,
+        text: req.body.text,
+        wifi: req.body.wifi,
+        food: req.body.food,
+        outlets: req.body.outlets,
+        noise: req.body.noise
+    };
+    let result =  await nooks
+        .updateOne(
+            {nid: { $eq: nookID }},
+            {$push: {reviews: review}}
+        );
+    
+    //update info in nook TODO
+    
+    req.flash('info', 'Successfully added review!');
+    return res.redirect(`/nook/${nookID}`);
+});
 
 // redirects you to the review page of the selected nook
 app.get('/get-review/', async (req, res) => {
@@ -272,7 +313,7 @@ app.get('/map/', (req, res) => {
     return res.render('map.ejs');
 });
 
-app.get('/profile/', (req, res) => {
+app.get('/profile/', async (req, res) => {
     if (!req.session.username) {
         req.flash('error', 'You are not logged in - please do so.');
         return res.redirect("/");
