@@ -14,7 +14,7 @@
 
     <ol>
         <% results.forEach((elt) => {%>
-        <li><%= elt.address %></li>
+        <li><a href="/nook/<%=elt.nid%>/"><%= elt.address %></a></li>
         <% }); %>
     </ol>
 
