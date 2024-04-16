@@ -352,13 +352,13 @@ app.post('/review/:nookID', async (req, res) => {
     const nooks = db.collection(NOOKS);
     let chosen = await nooks.find({ nid: { $eq: nookID } }).toArray();
     let nook = chosen[0];
-
     if (!nook) {
         req.flash('error', 'This nook does not exist.')
         return res.redirect('/');
     }
 
-    const rating = parseInt(req.body.nookRating);
+    const rating = parseInt(req.body.nookRating); //shows NaN
+    console.log('rating', rating);
     const wifi = req.body.wifiCheck;
     const wifiStatus = () => { return wifi ? "Wi-fi available" : "No wi-fi" }
     const outlet = req.body.outletCheck;
@@ -366,14 +366,13 @@ app.post('/review/:nookID', async (req, res) => {
     const campus = req.body.campusCheck;
     const foodStatus = () => { return campus ? "Food available" : "No Food" }
     const date = new Date();
-    const noise = req.body.noise;
+    const noise = req.body.noise; //shows undefined
+    console.log('noise', noise);
 
-    // Database definitions
     // let latest = await nooks.find().sort({ "nid": -1 }).toArray();
     // const id = latest[0].nid + 1;
 
-    //add review to database
-    //TODO: figure out how to add date
+    //add review to database TODO: figure out how to add date
     let review = {
         // rid: id,
         username: req.session.username,
@@ -381,6 +380,7 @@ app.post('/review/:nookID', async (req, res) => {
         tags: [wifiStatus(), outletStatus(), foodStatus(), noise],
         text: req.body.text
     };
+    console.log('text', req.body.text); //shows undefined
     let result =  await nooks
         .updateOne(
             {nid: { $eq: nookID }},

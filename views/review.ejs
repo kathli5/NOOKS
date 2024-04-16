@@ -21,7 +21,7 @@
       <form id="review_form" method="POST" action="/review/<%= nook.nid %>" enctype="multipart/form-data">
 
         <label for="nookRating" class="form-label">Rating</label>
-        <input type="text" name="nookRating" id="nookRating" class="form-control" />
+        <input type="text" name="nookRating" id="nookRating" value="" class="form-control" />
 
         <p>Tags</p>
         <div class="form-check">
@@ -50,12 +50,11 @@
           <input type="radio" id="loud" name="noise" value="loud">
           <label for="loud">Potentially Loud</label><br>
         </div>
-        </fieldset>
 
         <br>
         <fieldset>
           <legend>Add Review</legend>
-          <input type="text" id="text" name="text" required minlength="2" size="60" />
+          <input type="text" id="text" name="text" value="" placeholder="Add Review Here" required minlength="2" size="60" />
         </fieldset>
 
         <br>
