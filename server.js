@@ -82,9 +82,9 @@ var upload = multer({
 const DB = process.env.USER;
 const WMDB = 'wmdb';
 const STAFF = 'staff';
-const DBNAME = "nooks_db"; //change to our database 
+const DBNAME = "nooks_db"; 
 const NOOKS = "nooks";
-const USERS = "users"; //change to our users
+const USERS = "users"; 
 
 
 // main page. This shows the use of session cookies
@@ -172,12 +172,28 @@ app.post('/logout', (req, res) => {
 // two kinds of forms (GET and POST), both of which are pre-filled with data
 // from previous request, including a SELECT menu. Everything but radio buttons
 
-app.get('/search/', (req, res) => {
+app.get('/search/', async (req, res) => {
     console.log('get search form');
     if (!req.session.username) {
         req.flash('error', 'You are not logged in - please do so.');
         return res.redirect("/");
     }
+    let nookName = req.query.title;
+    let wifiTag = req.query.wifi;
+    let foodTag = req.query.food;
+    let outletTag = req.query.outlets;
+
+    console.log('You submitted a search with this name: ' + nookName);
+    console.log('You submitted a search with the following tags: ' + 
+    wifiTag, foodTag, outletTag);
+    const db = await Connection.open(mongoUri, DBNAME);
+    let searchResults = await db.collection(NOOKS).find(
+        {$or: [{name: {'$regex': nookName, '$options': 'gi'}},
+        {}]}
+    )
+
+    await Connection.close();
+
     return res.render('search.ejs', { action: '/search/', data: req.query });
 });
 
@@ -201,6 +217,7 @@ app.get('/results/', async (req, res) => {
     console.log('Connected to MongoDB');
     let results = await nooks.find({ tags: { $all: searchTags } }).toArray();
     console.log(results);
+    await Connection.close();
     return res.render('results.ejs', { results: results });
 });
 
@@ -281,19 +298,94 @@ app.get('/nook/:nookID', async (req, res) => {
 
     if (nook) {
         return res.render('nook.ejs',
-            {
-                rating: nook.rating,
-                poster: nook.poster,
-                tags: nook.tags,
-                reviews: nook.reviews,
-                address: nook.address,
-                photos: nook.photos
-            });
+        {
+            nook:nook,
+            rating: nook.rating,
+            poster: nook.poster,
+            tags: nook.tags,
+            reviews: nook.reviews,
+            address: nook.address,
+            photos: nook.photos
+        });
     } else {
         req.flash('error', 'This nook does not exist.')
         res.redirect('/');
     }
 });
+
+//review page of the selected nook
+app.get('/review/:nookID', async (req, res) => {
+    if (!req.session.username) {
+        req.flash('error', 'You are not logged in - please do so.');
+        return res.redirect("/");
+    }
+    let nookID = req.params.nookID;
+    nookID = Number(nookID);
+
+    // Search database for chosen movie and bring it out of array
+    const db = await Connection.open(mongoUri, DBNAME);
+    const nooks = db.collection(NOOKS);
+    let chosen = await nooks.find({ nid: { $eq: nookID } }).toArray();
+    let nook = chosen[0];
+    if (nook) {
+        return res.render('review.ejs',
+        {
+            nook: nook,
+        });
+    } else {
+        req.flash('error', 'This nook does not exist.')
+        res.redirect('/');
+    }
+});
+
+//post method for inserting review of nook
+app.post('/review/:nookID', async (req, res) => {
+    if (!req.session.username) {
+        req.flash('error', 'You are not logged in - please do so.');
+        return res.redirect("/");
+    }
+    let nookID = req.params.nookID;
+    nookID = Number(nookID);
+
+    // Search database for chosen movie and bring it out of array
+    const db = await Connection.open(mongoUri, DBNAME);
+    const nooks = db.collection(NOOKS);
+    let chosen = await nooks.find({ nid: { $eq: nookID } }).toArray();
+    let nook = chosen[0];
+
+    if (!nook) {
+        req.flash('error', 'This nook does not exist.')
+        return res.redirect('/');
+    }
+
+    //add review to database
+    //TODO: figure out counter for reviewID
+    let review = {
+        username: req.session.username,
+        text: req.body.text,
+        wifi: req.body.wifi,
+        food: req.body.food,
+        outlets: req.body.outlets,
+        noise: req.body.noise
+    };
+    let result =  await nooks
+        .updateOne(
+            {nid: { $eq: nookID }},
+            {$push: {reviews: review}}
+        );
+    
+    //update info in nook TODO
+    
+    req.flash('info', 'Successfully added review!');
+    return res.redirect(`/nook/${nookID}`);
+});
+
+// redirects you to the review page of the selected nook
+app.get('/get-review/', async (req, res) => {
+    let nid = parseInt(req.query.nid);
+    console.log(nid);
+    return res.redirect(`/review/${nid}`);
+})
 
 app.get('/map/', (req, res) => {
     if (!req.session.username) {
@@ -304,7 +396,7 @@ app.get('/map/', (req, res) => {
     return res.render('map.ejs');
 });
 
-app.get('/profile/', (req, res) => {
+app.get('/profile/', async (req, res) => {
     if (!req.session.username) {
         req.flash('error', 'You are not logged in - please do so.');
         return res.redirect("/");
@@ -313,9 +405,9 @@ app.get('/profile/', (req, res) => {
     return res.render('profile.ejs', { username: req.session.username });
 });
 
-//all nooks (currently looking at staff of wmdb, NEED TO CHANGE TO NOOKS)
+//all nooks 
 app.get('/all/', async (req, res) => {
-    if (!req.session.username) {
+        if (!req.session.username) {
         req.flash('error', 'You are not logged in - please do so.');
         return res.redirect("/");
     }
@@ -323,7 +415,8 @@ app.get('/all/', async (req, res) => {
     let all = await db.collection(NOOKS).find().toArray();
     console.log('len', all.length, 'first', all[0]);
     console.log('all nooks');
-    return res.render('list.ejs', { listDescription: 'All Nooks', list: all });
+    await Connection.close();
+    return res.render('list.ejs', { listDescription: 'All Nooks', list: all});
 });
 
 // ================================================================
