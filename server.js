@@ -358,15 +358,28 @@ app.post('/review/:nookID', async (req, res) => {
         return res.redirect('/');
     }
 
+    const rating = parseInt(req.body.nookRating);
+    const wifi = req.body.wifiCheck;
+    const wifiStatus = () => { return wifi ? "Wi-fi available" : "No wi-fi" }
+    const outlet = req.body.outletCheck;
+    const outletStatus = () => { return outlet ? "Outlet available" : "No outlet" }
+    const campus = req.body.campusCheck;
+    const foodStatus = () => { return campus ? "Food available" : "No Food" }
+    const date = new Date();
+    const noise = req.body.noise;
+
+    // Database definitions
+    // let latest = await nooks.find().sort({ "nid": -1 }).toArray();
+    // const id = latest[0].nid + 1;
+
     //add review to database
-    //TODO: figure out counter for reviewID
+    //TODO: figure out how to add date
     let review = {
+        // rid: id,
         username: req.session.username,
-        text: req.body.text,
-        wifi: req.body.wifi,
-        food: req.body.food,
-        outlets: req.body.outlets,
-        noise: req.body.noise
+        rating: rating,
+        tags: [wifiStatus(), outletStatus(), foodStatus(), noise],
+        text: req.body.text
     };
     let result =  await nooks
         .updateOne(
