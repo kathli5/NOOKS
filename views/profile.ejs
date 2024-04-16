@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8" />
     <title>Node Starter</title>
-    <!-- load local stylesheet (css) -->
-    <link rel="stylesheet" href="/styles.css" />
-    <!-- loading jquery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <%- include("partials/imports.ejs") %>
 </head>
 <body>
 
     <%- include("partials/navbar.ejs") %>
+    <section class="pagebody">
 
     <h1>PROFILE for <%= username %></h1>
 
@@ -19,10 +17,6 @@
           <button>Logout <%= username %></button>
         </form>
     </p>
-
-    <!-- load local js -->
-    <script src="/main.js"></script>
-    <script>
-    </script>
+</section>
 </body>
 </html>

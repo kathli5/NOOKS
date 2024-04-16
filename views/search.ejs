@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8" />
     <title>Node Starter</title>
-    <!-- load local stylesheet (css) -->
-    <link rel="stylesheet" href="/styles.css" />
-    <!-- loading jquery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <%- include("partials/imports.ejs") %>
 </head>
 <body>
   <%- include("partials/navbar.ejs") %>
-   
+  <section class="pagebody">
+
   <h1>Find a Nook</h1>
     <p>
         <%= data.customer %>
@@ -72,10 +70,9 @@
   </fieldset>
   <p><button type="submit">Search</button></p>
 </form>
+</section>
 
 
 
-    <!-- load local js -->
-    <script src="/main.js"></script>
 </body>
 </html>

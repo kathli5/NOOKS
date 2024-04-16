@@ -1,3 +1,8 @@
-h1 {
-  color: purple;
+.pagebody {
+  margin:3em;
+}
+
+.nook_photos {
+  max-width:90%;
+  max-height:20%;
 }

@@ -1,16 +1,21 @@
 <% if (messages.error) { %>
-    <div id="errors">
-      <% messages.error.forEach( msg => {%>
-      <p><%= msg %></p>
+  <div id="errors">
+    <% messages.error.forEach( msg=> {%>
+      <div id="errors" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <%= msg %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
       <% }) %>
-    </div>
-    <% } %>
-  
+  </div>
+  <% } %>
+
     <% if (messages.info) { %>
-    <div id="info">
-      <% messages.info.forEach( msg => {%>
-      <p><%= msg %></p>
-      <% }) %>
-    </div>
-    <% } %>
-  
+      <div id="info">
+        <% messages.info.forEach( msg=> {%>
+          <div id="errors" class="alert alert-info alert-dismissible fade show" role="alert">
+            <%= msg %>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          <% }) %>
+      </div>
+      <% } %>

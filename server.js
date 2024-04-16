@@ -38,9 +38,13 @@ app.use(bodyParser.json());
 app.use(cs304.logRequestData);  // tell the user about any request data
 app.use(flash());
 
+// enabling css
+app.use('/public', express.static("public"));
 
 app.use(serveStatic('public'));
 app.set('view engine', 'ejs');
+
+app.use('/uploads', express.static('uploads'));
 
 const mongoUri = cs304.getMongoUri();
 
@@ -53,6 +57,25 @@ app.use(cookieSession({
 
 const ROUNDS = 10;
 
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads')
+    },
+    filename: function (req, file, cb) {
+        let parts = file.originalname.split('.');
+        let ext = parts[parts.length - 1];
+        let hhmmss = new Date();
+        hhmmss = hhmmss.toTimeString();
+        cb(null, file.fieldname + '-' + hhmmss + '.' + ext);
+    }
+})
+
+var upload = multer({
+    storage: storage,
+    // max fileSize in bytes, causes an ugly error
+    limits: { fileSize: 100_000 }
+});
+
 // ================================================================
 // custom routes here
 
@@ -62,6 +85,7 @@ const STAFF = 'staff';
 const DBNAME = "nooks_db"; //change to our database 
 const NOOKS = "nooks";
 const USERS = "users"; //change to our users
+
 
 // main page. This shows the use of session cookies
 app.get('/', (req, res) => {
@@ -180,6 +204,65 @@ app.get('/results/', async (req, res) => {
     return res.render('results.ejs', { results: results });
 });
 
+app.get('/add-nook/', async (req, res) => {
+    if (!req.session.username) {
+        req.flash('error', 'You are not logged in - please do so.');
+        return res.redirect("/");
+    }
+    return res.render('nookForm.ejs');
+})
+
+app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
+    if (!req.session.username) {
+        req.flash('error', 'You are not logged in - please do so.');
+        return res.redirect("/");
+    }
+
+    // Defining variables for movie information from form.
+    const poster = req.session.username;
+    const address = req.body.nookAddress;
+    const rating = req.body.nookRating;
+    const numRating = parseInt(rating);
+    const wifi = req.body.wifiCheck;
+    const wifiStatus = () => { return wifi ? "Wi-fi available" : "No wi-fi" }
+    const outlet = req.body.outletCheck;
+    const outletStatus = () => { return outlet ? "Outlet available" : "No outlet" }
+    const campus = req.body.campusCheck;
+    const campusStatus = () => { return campus ? "On-campus" : "Off-campus" }
+    const date = new Date();
+
+    // Database definitions
+    const db = await Connection.open(mongoUri, DBNAME);
+    const nooks = db.collection(NOOKS);
+
+    let latest = await nooks.find().sort({ "nid": -1 }).toArray();
+    const id = latest[0].nid + 1;
+
+    console.log(address);
+    console.log(poster);
+    console.log(numRating);
+
+    if (address === "" || isNaN(numRating) || !req.file) {
+        req.flash('error', 'Please fill out every field.');
+        return res.render("nookForm.ejs");
+    } else {
+        // Updates movie in the database with changed information.
+        let insertion = await nooks.insertOne({
+            nid: id,
+            address: address,
+            poster: poster,
+            rating: numRating,
+            tags: [wifiStatus(), outletStatus(), campusStatus()],
+            reviews: [],
+            photos: '/uploads/' + req.file.filename,
+        });
+
+        // Flashes confirmation and re-renders the update page and form.
+        req.flash("info", "Your nook has been added.")
+        res.redirect("/nook/" + id);
+    }
+});
+
 app.get('/nook/:nookID', async (req, res) => {
     if (!req.session.username) {
         req.flash('error', 'You are not logged in - please do so.');
@@ -198,14 +281,14 @@ app.get('/nook/:nookID', async (req, res) => {
 
     if (nook) {
         return res.render('nook.ejs',
-        {
-            rating: nook.rating,
-            poster: nook.poster,
-            tags: nook.tags,
-            reviews: nook.reviews,
-            address: nook.address,
-            photos: nook.photos
-        });
+            {
+                rating: nook.rating,
+                poster: nook.poster,
+                tags: nook.tags,
+                reviews: nook.reviews,
+                address: nook.address,
+                photos: nook.photos
+            });
     } else {
         req.flash('error', 'This nook does not exist.')
         res.redirect('/');
@@ -236,8 +319,8 @@ app.get('/all/', async (req, res) => {
         req.flash('error', 'You are not logged in - please do so.');
         return res.redirect("/");
     }
-    const db = await Connection.open(mongoUri, WMDB);
-    let all = await db.collection(STAFF).find({}).sort({ name: 1 }).toArray();
+    const db = await Connection.open(mongoUri, DBNAME);
+    let all = await db.collection(NOOKS).find().toArray();
     console.log('len', all.length, 'first', all[0]);
     console.log('all nooks');
     return res.render('list.ejs', { listDescription: 'All Nooks', list: all });

@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8" />
     <title>Node Starter</title>
-    <!-- load local stylesheet (css) -->
-    <link rel="stylesheet" href="/styles.css" />
-    <!-- loading jquery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <%- include("partials/imports.ejs") %>
 </head>
 <body>
+
+  <section class="pagebody">
+
     <h1>Welcome to NOOKS!</h1>
 
     <%- include("partials/flashes.ejs") %>
@@ -37,10 +37,6 @@
       <button type="submit">login</button>
     </form>
   </p>
-
-    <!-- load local js -->
-    <script src="/main.js"></script>
-    <script>
-    </script>
+</section>
 </body>
 </html>

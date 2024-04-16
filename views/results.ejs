@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8" />
     <title>Lookup App</title>
-    <!-- load local stylesheet (css) -->
-    <link rel="stylesheet" href="/styles.css" />
-    <!-- loading jquery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <%- include("partials/imports.ejs") %>
 </head>
 <body>
 
     <%- include("partials/navbar.ejs") %>
+    <section class="pagebody">
+
     <h1> Search Results </h1>
 
     <ol>
@@ -19,7 +18,6 @@
         <% }); %>
     </ol>
 
-    <!-- load local js -->
-    <script src="/main.js"></script>
+</section>
 </body>
 </html>

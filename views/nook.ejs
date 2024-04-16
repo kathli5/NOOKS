@@ -6,14 +6,12 @@
   <title>
     <%=address%>
   </title>
-  <!-- load local stylesheet (css) -->
-  <link rel="stylesheet" href="../public/styles.css" />
-  <!-- loading jquery -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <%- include("partials/imports.ejs") %>
 </head>
 
 <body>
   <%- include("partials/navbar.ejs") %>
+  <section class="pagebody">
 
     <h1>
       <%= address %>
@@ -36,7 +34,7 @@
      <h2>Photos:</h2> 
       <img class="nook_photos" src="<%= photos %>" alt="Photo of <%= address %>" />
       
-
+</section>
 </body>
 
 </html>

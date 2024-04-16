@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>
+    Add Nook
+  </title>
+  <%- include("partials/imports.ejs") %>
+
+</head>
+
+<body>
+  <%- include("partials/navbar.ejs") %>
+  <%- include("partials/flashes.ejs") %>
+
+    <section class="pagebody">
+      <h1>Add Nook</h1>
+
+      <form id="addnook_form" method="POST" action="/add-nook/" enctype="multipart/form-data">
+        <label for="nookAddress" class="form-label">Address</label>
+        <input type="text" name="nookAddress" id="nookAddress" class="form-control" />
+        <label for="nookRating" class="form-label">Rating</label>
+        <input type="text" name="nookRating" id="nookRating" class="form-control" />
+        <p>Tags</p>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="wifi" id="wifi-check" name="wifiCheck">
+          <label class="form-check-label" for="wifi-check">
+            Wi-Fi Available?
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="outlet" id="outlet-check" name="outletCheck">
+          <label class="form-check-label" for="outlet-check">
+            Outlet Available?
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="campus" id="campus-check" name="campusCheck">
+          <label class="form-check-label" for="campus-check">
+            On campus?
+          </label>
+        </div>
+        
+        <label for="nookPhoto" class="form-label">Photo</label>
+        <input type="file" accept="image/*" name="nookPhoto" id="nookPhoto" class="form-control" />
+        <button type="submit" class="btn btn-primary mt-3 form-control">Submit</button>
+      </form>
+
+    </section>
+
+</body>
+
+</html>
