@@ -84,23 +84,13 @@ const DBNAME = "nooks_db";
 const NOOKS = "nooks";
 const USERS = "users";
 
-
 // main page. This shows the use of session cookies
 app.get('/', (req, res) => {
     let uid = req.session.uid || 'unknown';
-    let visits = req.session.visits || 0;
-    visits++;
-    req.session.visits = visits;
-    console.log('uid', uid);
-    return res.render('index.ejs', { uid, visits });
+    return res.render('index.ejs', { uid });
 });
 
-// main page. This shows the use of session cookies
-app.get('/', (req, res) => {
-    return res.render('index.ejs', { uid, visits });
-});
-
-//LOGIN
+//Adding a new user. Adds username and password to user collection
 app.post("/join", async (req, res) => {
     try {
         const username = req.body.username;
@@ -127,6 +117,7 @@ app.post("/join", async (req, res) => {
     }
 });
 
+//Logging in existing user. 
 app.post("/login", async (req, res) => {
     try {
         const username = req.body.username;
@@ -155,6 +146,7 @@ app.post("/login", async (req, res) => {
     }
 });
 
+//Logging out user
 app.post('/logout', (req, res) => {
     if (req.session.username) {
         req.session.username = null;
@@ -167,14 +159,18 @@ app.post('/logout', (req, res) => {
     }
 });
 
-// two kinds of forms (GET and POST), both of which are pre-filled with data
-// from previous request, including a SELECT menu. Everything but radio buttons
-
+// Search page for existing Nooks
 app.get('/search/', async (req, res) => {
+    // Checks if user is logged in
+    if (!req.session.username) {
+        req.flash('error', 'You are not logged in. Please log in.');
+        return res.redirect("/");
+    }
     return res.render('search.ejs');
 }
 );
 
+// Results page for search results
 app.get('/results/', async (req, res) => {
     console.log('Getting search results');
 
@@ -218,6 +214,7 @@ app.get('/results/', async (req, res) => {
     return res.render('results.ejs', { results: searchResults });
 });
 
+// Page to add nook
 app.get('/add-nook/', async (req, res) => {
     if (!req.session.username) {
         req.flash('error', 'You are not logged in - please do so.');
@@ -226,6 +223,7 @@ app.get('/add-nook/', async (req, res) => {
     return res.render('nookForm.ejs');
 })
 
+// Adding a new nook to database
 app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
     // Defining variables for nook information from form.
     const poster = req.session.username;
@@ -250,7 +248,7 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
 
     console.log(numRating);
 
-    if (address === "" || isNaN(numRating)) {
+    if (address === "" || isNaN(numRating)) { //check that address and numRating are filled
         req.flash('error', 'Please fill out every field.');
         return res.render("nookForm.ejs");
     } else {
@@ -265,7 +263,7 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
             reviews: [],
         });
 
-        //uploads photo if photo is uploaded
+        //adds photo to nook document if photo is uploaded
         if (req.file) {
             let photoInsert = await nooks.updateOne(
                 { nid: { $eq: id } },
@@ -278,6 +276,7 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
     }
 });
 
+// Individual nook page
 app.get('/nook/:nookID', async (req, res) => {
     if (!req.session.username) {
         req.flash('error', 'You are not logged in - please do so.');
@@ -347,6 +346,7 @@ app.post('/review/:nookID', async (req, res) => {
     let chosen = await nooks.find({ nid: { $eq: nookID } }).toArray();
     let nook = chosen[0];
 
+    //retrieves form data
     let rating = parseInt(req.body.nookRating);
     const wifi = req.body.wifiCheck;
     const wifiStatus = () => { return wifi ? "Wi-fi available" : "No wi-fi" }
@@ -358,7 +358,6 @@ app.post('/review/:nookID', async (req, res) => {
 
     //add reviewID with earliest review being rid= 1
     let reviews = nook.reviews;
-    console.log(reviews);
     let id = 1
     if (reviews.length == 0) {
         id = 1
@@ -374,7 +373,6 @@ app.post('/review/:nookID', async (req, res) => {
         tags: [wifiStatus(), outletStatus(), foodStatus(), noise],
         text: req.body.text
     };
-    console.log('text', req.body.text); //shows undefined
     let result = await nooks
         .updateOne(
             { nid: { $eq: nookID } },
@@ -382,10 +380,11 @@ app.post('/review/:nookID', async (req, res) => {
         );
 
     //update info in nook to reflect tags in most recent review
+    let campusStatus = nook.tags[nook.tags.length - 1] //grab campus status, assume this will be unchanging
     let update = await nooks
         .updateOne(
             { nid: { $eq: nookID } },
-            {$set: {tags: [wifiStatus(), outletStatus(), foodStatus(), noise]}},
+            {$set: {tags: [wifiStatus(), outletStatus(), foodStatus(), noise, campusStatus]}},
         );
         
     //update average rating in nook
@@ -393,7 +392,11 @@ app.post('/review/:nookID', async (req, res) => {
     reviews.forEach((elem) => {
         totalRating += elem.rating;
     })
-    let averageRating = Math.round(totalRating/reviews.length);
+    let averageRating = Math.round(totalRating/reviews.length); 
+    if (reviews.length == 0) { //if there are no other reviews
+        averageRating =  Math.round((nook.rating + rating)/2);
+    };
+    console.log(averageRating)
     let updateReview = await nooks
         .updateOne(
             { nid: { $eq: nookID } },
