@@ -186,6 +186,7 @@ app.get('/results/', async (req, res) => {
 
     //gets search from form
     let nookName = req.query.name;
+    console.log(nookName);
     let wifi = req.query.wifi;
     let food = req.query.food;
     let location = req.query.location;
@@ -201,9 +202,10 @@ app.get('/results/', async (req, res) => {
     const nooks = db.collection(NOOKS);
     console.log('Connected to MongoDB');
     let searchResults = [];
-    if (nookName === undefined) {
+    if (!nookName) {
+        console.log("searching without nook name", searchTags);
         searchResults = await nooks.find({ tags: { $all: searchTags } }).toArray();
-    } else if (searchTags.length === 0) {
+    } else if (searchTags.length == 0) {
         searchResults = await nooks.find({ name: { $regex: nookName, $options: 'i' } }).toArray();
     } else {
         searchResults = await nooks.find({ name: { $regex: nookName, $options: 'i' }, tags: { $all: searchTags } }).toArray();
