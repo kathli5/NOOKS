@@ -393,7 +393,7 @@ app.post('/review/:nookID', async (req, res) => {
     reviews.forEach((elem) => {
         totalRating += elem.rating;
     })
-    let averageRating = totalRating/reviews.length;
+    let averageRating = Math.round(totalRating/reviews.length);
     let updateReview = await nooks
         .updateOne(
             { nid: { $eq: nookID } },
