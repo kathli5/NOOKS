@@ -237,8 +237,9 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
         return res.redirect("/");
     }
 
-    // Defining variables for movie information from form.
+    // Defining variables for nook information from form.
     const poster = req.session.username;
+    const nookName = req.body.name;
     const address = req.body.nookAddress;
     const rating = req.body.nookRating;
     const numRating = parseInt(rating);
@@ -268,6 +269,7 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
         // Updates movie in the database with changed information.
         let insertion = await nooks.insertOne({
             nid: id,
+            nook: nookName,
             address: address,
             poster: poster,
             rating: numRating,
