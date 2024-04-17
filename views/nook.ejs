@@ -11,33 +11,42 @@
 
 <body>
   <%- include("partials/navbar.ejs") %>
-  <section class="pagebody">
+    <section class="pagebody">
 
-    <h1>
-      <%= address %>
-    </h1>
-    <p>Posted by <%= poster %></p>
-    <h2>Rating:</h2>
-    <span><%= rating %></span>
-    <h2>Tags:</h2>
-    <ul>
-      <% tags.forEach(elt=> { %>
-        <li><%=elt%></li>
-      <% }) %>
-    </ul>
-    <h2>Reviews:</h2>
-    <ul>
-      <% reviews.forEach(elt=> { %>
-        <li><%=elt.text%></li>
-      <% }) %>
-    </ul>
-     <h2>Photos:</h2> 
+      <h1>
+        <%= nook.name %>
+      </h1>
+      <p>Posted by <%= poster %>
+      </p>
+      <h2>Rating:</h2>
+      <span>
+        <%= rating %>
+      </span>
+      <h2>Tags:</h2>
+      <ul>
+        <% tags.forEach(elt=> { %>
+          <li>
+            <%=elt%>
+          </li>
+          <% }) %>
+      </ul>
+      <h2>Reviews:</h2>
+      <ul>
+        <% reviews.forEach(elt=> { %>
+          <li>
+            <%=elt.text%>
+          </li>
+          <% }) %>
+      </ul>
+      <h2>Photos:</h2>
       <img class="nook_photos" src="<%= photos %>" alt="Photo of <%= address %>" />
-      
-</section>
-    <form method="GET" action="/get-review">
-    <p><button name="nid" id="nid" value="<%= nook.nid %>">Add Review</button></p>
-    </form>
+
+
+      <form method="GET" action="/get-review">
+        <br>
+        <p><button name="nid" id="nid" value="<%= nook.nid %>">Add Review</button></p>
+      </form>
+    </section>
 </body>
 
 </html>
