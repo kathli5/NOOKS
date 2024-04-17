@@ -178,7 +178,7 @@ app.get('/search/', async (req, res) => {
         req.flash('error', 'You are not logged in - please do so.');
         return res.redirect("/");
     }
-    let nookName = req.query.title;
+    let nookName = req.query.name;
     let wifiTag = req.query.wifi;
     let foodTag = req.query.food;
     let outletTag = req.query.outlets;
@@ -195,7 +195,6 @@ app.get('/search/', async (req, res) => {
     )
 
     await Connection.close();
-
     return res.render('search.ejs', { action: '/search/', data: req.query });
 });
 
@@ -205,13 +204,14 @@ app.get('/results/', async (req, res) => {
         req.flash('error', 'You are not logged in - please do so.');
         return res.redirect("/");
     }
-    let title = req.query.title;
+    let name = req.query.name;
     let wifi = req.query.wifi;
     let food = req.query.food;
     let location = req.query.location;
     let noise = req.query.noise;
+    let outlets = req.query.outlets;
     console.log(wifi, location)
-    let searchTags = [wifi, food, location, noise].filter(tag => tag != null && tag !== '' && tag != 'undefined');
+    let searchTags = [wifi, food, location, noise, outlets].filter(tag => tag != null && tag !== '' && tag != 'undefined');
     console.log(searchTags);
     console.log('Connecting to MongoDB:', mongoUri);
     const db = await Connection.open(mongoUri, DBNAME);
