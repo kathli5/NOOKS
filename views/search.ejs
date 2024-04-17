@@ -12,14 +12,6 @@
   <section class="pagebody">
 
   <h1>Find a Nook</h1>
-    <p>
-      <%= data.customer %>
-        <%= data.phone %>
-          <%= data.addr %>
-            <%= data.size %>
-              <%= data.due %>
-                <%= data.instructions %>
-    </p>
 
 
     <h2>Search by name if you know what nook or looking for, or find a new nook using the tag search!</h2>
@@ -30,7 +22,9 @@
 
       <fieldset>
         <legend>Search By Nook</legend>
-        <p><label>Name: <input type=name name="name" value="<%= data.name %>" placeholder="Name"></label></p>
+        <label>
+          Search: <input type="text" name="name" placeholder="Enter a Nook">
+        </label>
 
 
       </fieldset>
@@ -47,7 +41,7 @@
           <label for="food">Food Availability</label>
         </div>
         <div>
-          <input type="checkbox" id="outlets" name="outlets" value="Outlets available" />
+          <input type="checkbox" id="outlets" name="outlets" value="Outlet available" />
           <label for="outlets">Outlets</label>
         </div>
 

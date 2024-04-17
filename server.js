@@ -173,54 +173,49 @@ app.post('/logout', (req, res) => {
 // from previous request, including a SELECT menu. Everything but radio buttons
 
 app.get('/search/', async (req, res) => {
-    console.log('get search form');
-    if (!req.session.username) {
-        req.flash('error', 'You are not logged in - please do so.');
-        return res.redirect("/");
-    }
-    let nookName = req.query.name;
-    let wifiTag = req.query.wifi;
-    let foodTag = req.query.food;
-    let outletTag = req.query.outlets;
-
-    console.log('You submitted a search with this name: ' + nookName);
-    console.log('You submitted a search with the following tags: ' +
-        wifiTag, foodTag, outletTag);
-    const db = await Connection.open(mongoUri, DBNAME);
-    let searchResults = await db.collection(NOOKS).find(
-        {
-            $or: [{ name: { '$regex': nookName, '$options': 'gi' } },
-            {}]
-        }
-    )
-
-    await Connection.close();
-    return res.render('search.ejs', { action: '/search/', data: req.query });
-});
+    return res.render('search.ejs');
+}
+);
 
 app.get('/results/', async (req, res) => {
-    console.log('search form results');
+    console.log('Getting search results');
+
+    // Checks if user is logged in
     if (!req.session.username) {
-        req.flash('error', 'You are not logged in - please do so.');
+        req.flash('error', 'You are not logged in. Please log in.');
         return res.redirect("/");
     }
-    let name = req.query.name;
+
+    //gets search from form
+    let nookName = req.query.name;
     let wifi = req.query.wifi;
     let food = req.query.food;
     let location = req.query.location;
     let noise = req.query.noise;
     let outlets = req.query.outlets;
-    console.log(wifi, location)
     let searchTags = [wifi, food, location, noise, outlets].filter(tag => tag != null && tag !== '' && tag != 'undefined');
-    console.log(searchTags);
+    console.log("Searched tags: ", searchTags);
+    console.log("Searched name: ", nookName);
+
+    //searches based on form inputs
     console.log('Connecting to MongoDB:', mongoUri);
     const db = await Connection.open(mongoUri, DBNAME);
     const nooks = db.collection(NOOKS);
     console.log('Connected to MongoDB');
-    let results = await nooks.find({ tags: { $all: searchTags } }).toArray();
-    console.log(results);
+    let searchResults = [];
+    if (nookName === undefined) {
+        searchResults = await nooks.find({ tags: { $all: searchTags } }).toArray();
+    } else if (searchTags.length === 0) {
+        searchResults = await nooks.find({ name: { $regex: nookName, $options: 'i' } }).toArray();
+    } else {
+        searchResults = await nooks.find({ name: { $regex: nookName, $options: 'i' }, tags: { $all: searchTags } }).toArray();
+    }
+
+    console.log("RESULTS: ", searchResults);
     await Connection.close();
-    return res.render('results.ejs', { results: results });
+
+    //renders results
+    return res.render('results.ejs', { results: searchResults });
 });
 
 app.get('/add-nook/', async (req, res) => {
