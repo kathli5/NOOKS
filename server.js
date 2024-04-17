@@ -268,7 +268,7 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
         //uploads photo if photo is uploaded
         if (req.file) {
             let photoInsert = await nooks.updateOne(
-                { nid: { $eq: nookID } },
+                { nid: { $eq: id } },
                 { $push: { photos: '/uploads/' + req.file.filename, } }
             );
         }
