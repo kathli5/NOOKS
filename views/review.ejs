@@ -22,7 +22,7 @@
         <form id="review_form" method="POST" action="/review/<%= nook.nid %>">
 
           <label for="nookRating" class="form-label">Rating</label>
-          <input type="text" name="nookRating" id="nookRating" class="form-control" />
+          <input type="text" name="nookRating" id="nookRating" class="form-control" required/>
 
           <br>
           <p>Tags</p>
@@ -47,7 +47,7 @@
 
           <br>
           <p>Noise Level</p>
-          <input type="radio" id="quiet" name="noise" value="quiet">
+          <input type="radio" id="quiet" name="noise" value="quiet" required>
           <label for="quiet">Usually Quiet</label><br>
           <input type="radio" id="loud" name="noise" value="loud">
           <label for="loud">Potentially Loud</label><br>

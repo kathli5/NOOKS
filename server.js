@@ -232,8 +232,9 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
         return res.redirect("/");
     }
 
-    // Defining variables for movie information from form.
+    // Defining variables for nook information from form.
     const poster = req.session.username;
+    const nookName = req.body.name;
     const address = req.body.nookAddress;
     const rating = req.body.nookRating;
     const numRating = parseInt(rating);
@@ -263,6 +264,7 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
         // Updates movie in the database with changed information.
         let insertion = await nooks.insertOne({
             nid: id,
+            nook: nookName,
             address: address,
             poster: poster,
             rating: numRating,
@@ -365,7 +367,6 @@ app.post('/review/:nookID', async (req, res) => {
     else {
         id = reviews.length + 1;
     }
-
     //add review to database 
     let review = {
         rid: id,
@@ -385,9 +386,21 @@ app.post('/review/:nookID', async (req, res) => {
     let update = await nooks
         .updateOne(
             { nid: { $eq: nookID } },
-            {$set: {tags: [wifiStatus(), outletStatus(), foodStatus(), noise]}}
+            {$set: {tags: [wifiStatus(), outletStatus(), foodStatus(), noise]}},
         );
-
+        
+    //update average rating in nook
+    let totalRating = 0;
+    reviews.forEach((elem) => {
+        totalRating += elem.rating;
+    })
+    let averageRating = totalRating/reviews.length;
+    let updateReview = await nooks
+        .updateOne(
+            { nid: { $eq: nookID } },
+            {$set: {rating: averageRating}}
+        );
+    
     req.flash('info', 'Successfully added review!');
     return res.redirect(`/nook/${nookID}`);
 });
