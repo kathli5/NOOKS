@@ -13,15 +13,15 @@
 
 <body>
   <%- include("partials/navbar.ejs") %>
-    <%- include("partials/flashes.ejs") %>
+  <%- include("partials/flashes.ejs") %>
 
       <h1>Add Review for <%= nook.name %>
       </h1>
 
-      <form id="review_form" method="POST" action="/review/<%= nook.nid %>" enctype="multipart/form-data">
+      <form id="review_form" method="POST" action="/review/<%= nook.nid %>">
 
         <label for="nookRating" class="form-label">Rating</label>
-        <input type="text" name="nookRating" id="nookRating" value="" class="form-control" />
+        <input type="text" name="nookRating" id="nookRating" class="form-control" />
 
         <p>Tags</p>
         <div class="form-check">
@@ -43,7 +43,7 @@
           </label>
         </div>
 
-        <div>
+        <div class="form-check form-control">
           <p>Noise Level</p>
           <input type="radio" id="quiet" name="noise" value="quiet">
           <label for="quiet">Usually Quiet</label><br>
@@ -54,7 +54,7 @@
         <br>
         <fieldset>
           <legend>Add Review</legend>
-          <input type="text" id="text" name="text" value="" placeholder="Add Review Here" required minlength="2" size="60" />
+          <input type="text" id="text" name="text" value="" class="form-control" placeholder="Add Review Here" required minlength="2" size="60" />
         </fieldset>
 
         <br>

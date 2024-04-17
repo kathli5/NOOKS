@@ -82,9 +82,9 @@ var upload = multer({
 const DB = process.env.USER;
 const WMDB = 'wmdb';
 const STAFF = 'staff';
-const DBNAME = "nooks_db"; 
+const DBNAME = "nooks_db";
 const NOOKS = "nooks";
-const USERS = "users"; 
+const USERS = "users";
 
 
 // main page. This shows the use of session cookies
@@ -184,12 +184,14 @@ app.get('/search/', async (req, res) => {
     let outletTag = req.query.outlets;
 
     console.log('You submitted a search with this name: ' + nookName);
-    console.log('You submitted a search with the following tags: ' + 
-    wifiTag, foodTag, outletTag);
+    console.log('You submitted a search with the following tags: ' +
+        wifiTag, foodTag, outletTag);
     const db = await Connection.open(mongoUri, DBNAME);
     let searchResults = await db.collection(NOOKS).find(
-        {$or: [{name: {'$regex': nookName, '$options': 'gi'}},
-        {}]}
+        {
+            $or: [{ name: { '$regex': nookName, '$options': 'gi' } },
+            {}]
+        }
     )
 
     await Connection.close();
@@ -298,18 +300,18 @@ app.get('/nook/:nookID', async (req, res) => {
 
     if (nook) {
         return res.render('nook.ejs',
-        {
-            nook:nook,
-            rating: nook.rating,
-            poster: nook.poster,
-            tags: nook.tags,
-            reviews: nook.reviews,
-            address: nook.address,
-            photos: nook.photos
-        });
+            {
+                nook: nook,
+                rating: nook.rating,
+                poster: nook.poster,
+                tags: nook.tags,
+                reviews: nook.reviews,
+                address: nook.address,
+                photos: nook.photos
+            });
     } else {
         req.flash('error', 'This nook does not exist.')
-        res.redirect('/');
+        res.redirect('/all');
     }
 });
 
@@ -329,21 +331,17 @@ app.get('/review/:nookID', async (req, res) => {
     let nook = chosen[0];
     if (nook) {
         return res.render('review.ejs',
-        {
-            nook: nook,
-        });
+            {
+                nook: nook,
+            });
     } else {
         req.flash('error', 'This nook does not exist.')
-        res.redirect('/');
+        res.redirect('/all');
     }
 });
 
 //post method for inserting review of nook
 app.post('/review/:nookID', async (req, res) => {
-    if (!req.session.username) {
-        req.flash('error', 'You are not logged in - please do so.');
-        return res.redirect("/");
-    }
     let nookID = req.params.nookID;
     nookID = Number(nookID);
 
@@ -352,43 +350,43 @@ app.post('/review/:nookID', async (req, res) => {
     const nooks = db.collection(NOOKS);
     let chosen = await nooks.find({ nid: { $eq: nookID } }).toArray();
     let nook = chosen[0];
-    if (!nook) {
-        req.flash('error', 'This nook does not exist.')
-        return res.redirect('/');
-    }
 
-    const rating = parseInt(req.body.nookRating); //shows NaN
-    console.log('rating', rating);
+    let rating = parseInt(req.body.nookRating);
     const wifi = req.body.wifiCheck;
     const wifiStatus = () => { return wifi ? "Wi-fi available" : "No wi-fi" }
     const outlet = req.body.outletCheck;
     const outletStatus = () => { return outlet ? "Outlet available" : "No outlet" }
     const campus = req.body.campusCheck;
     const foodStatus = () => { return campus ? "Food available" : "No Food" }
-    const date = new Date();
-    const noise = req.body.noise; //shows undefined
-    console.log('noise', noise);
+    let noise = req.body.noise;
 
-    // let latest = await nooks.find().sort({ "nid": -1 }).toArray();
-    // const id = latest[0].nid + 1;
+    //add reviewID with earliest review being rid= 1
+    let reviews = nook.reviews;
+    console.log(reviews);
+    let id = 1
+    if (reviews.length == 0) {
+        id = 1
+    }
+    else {
+        id = reviews.length + 1;
+    }
 
-    //add review to database TODO: figure out how to add date
+    //add review to database 
     let review = {
-        // rid: id,
+        rid: id,
         username: req.session.username,
         rating: rating,
         tags: [wifiStatus(), outletStatus(), foodStatus(), noise],
         text: req.body.text
     };
     console.log('text', req.body.text); //shows undefined
-    let result =  await nooks
+    let result = await nooks
         .updateOne(
-            {nid: { $eq: nookID }},
-            {$push: {reviews: review}}
+            { nid: { $eq: nookID } },
+            { $push: { reviews: review } }
         );
-    
+
     //update info in nook TODO
-    
     req.flash('info', 'Successfully added review!');
     return res.redirect(`/nook/${nookID}`);
 });
@@ -420,7 +418,7 @@ app.get('/profile/', async (req, res) => {
 
 //all nooks 
 app.get('/all/', async (req, res) => {
-        if (!req.session.username) {
+    if (!req.session.username) {
         req.flash('error', 'You are not logged in - please do so.');
         return res.redirect("/");
     }
@@ -429,7 +427,7 @@ app.get('/all/', async (req, res) => {
     console.log('len', all.length, 'first', all[0]);
     console.log('all nooks');
     await Connection.close();
-    return res.render('list.ejs', { listDescription: 'All Nooks', list: all});
+    return res.render('list.ejs', { listDescription: 'All Nooks', list: all });
 });
 
 // ================================================================
