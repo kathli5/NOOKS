@@ -411,6 +411,7 @@ app.get('/get-review/', async (req, res) => {
     return res.redirect(`/review/${nid}`);
 })
 
+//map page, currently in progress
 app.get('/map/', (req, res) => {
     if (!req.session.username) {
         req.flash('error', 'You are not logged in - please do so.');
@@ -419,7 +420,7 @@ app.get('/map/', (req, res) => {
     console.log('map view');
     return res.render('map.ejs');
 });
-
+//profile page, currently in progress
 app.get('/profile/', async (req, res) => {
     if (!req.session.username) {
         req.flash('error', 'You are not logged in - please do so.');
@@ -429,7 +430,7 @@ app.get('/profile/', async (req, res) => {
     return res.render('profile.ejs', { username: req.session.username });
 });
 
-//all nooks 
+//retrieves all nooks and lists them on the nooks home page
 app.get('/all/', async (req, res) => {
     if (!req.session.username) {
         req.flash('error', 'You are not logged in - please do so.');
@@ -440,6 +441,7 @@ app.get('/all/', async (req, res) => {
     console.log('len', all.length, 'first', all[0]);
     console.log('all nooks');
     await Connection.close();
+    //returns nooks to list them on the list.ejs page
     return res.render('list.ejs', { listDescription: 'All Nooks', list: all });
 });
 
