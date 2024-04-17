@@ -192,21 +192,27 @@ app.get('/results/', async (req, res) => {
     console.log("Searched tags: ", searchTags);
     console.log("Searched name: ", nookName);
 
-    //searches based on form inputs
+    //connecting to MongoDB
     console.log('Connecting to MongoDB:', mongoUri);
     const db = await Connection.open(mongoUri, DBNAME);
     const nooks = db.collection(NOOKS);
     console.log('Connected to MongoDB');
+
+    //searching the database based on form inputs
     let searchResults = [];
+    //only searching by tags
     if (!nookName) {
         console.log("searching without nook name", searchTags);
         searchResults = await nooks.find({ tags: { $all: searchTags } }).toArray();
+
+    //only searching by name
     } else if (searchTags.length == 0) {
         searchResults = await nooks.find({ name: { $regex: nookName, $options: 'i' } }).toArray();
+    
+    //searching by both name and tag
     } else {
         searchResults = await nooks.find({ name: { $regex: nookName, $options: 'i' }, tags: { $all: searchTags } }).toArray();
     }
-
     console.log("RESULTS: ", searchResults);
     await Connection.close();
 
