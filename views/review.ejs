@@ -13,56 +13,59 @@
 
 <body>
   <%- include("partials/navbar.ejs") %>
-  <%- include("partials/flashes.ejs") %>
+    <%- include("partials/flashes.ejs") %>
 
-      <h1>Add Review for <%= nook.name %>
-      </h1>
+      <section class="pagebody">
+        <h1>Add Review for <%= nook.name %>
+        </h1>
 
-      <form id="review_form" method="POST" action="/review/<%= nook.nid %>">
+        <form id="review_form" method="POST" action="/review/<%= nook.nid %>">
 
-        <label for="nookRating" class="form-label">Rating</label>
-        <input type="text" name="nookRating" id="nookRating" class="form-control" />
+          <label for="nookRating" class="form-label">Rating</label>
+          <input type="text" name="nookRating" id="nookRating" class="form-control" />
 
-        <p>Tags</p>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="wifi" id="wifi-check" name="wifiCheck">
-          <label class="form-check-label" for="wifi-check">
-            Wi-Fi Available?
-          </label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="outlet" id="outlet-check" name="outletCheck">
-          <label class="form-check-label" for="outlet-check">
-            Outlet Available?
-          </label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="food" id="food-check" name="foodCheck">
-          <label class="form-check-label" for="food-check">
-            Food Available?
-          </label>
-        </div>
+          <br>
+          <p>Tags</p>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="wifi" id="wifi-check" name="wifiCheck">
+            <label class="form-check-label" for="wifi-check">
+              Wi-Fi Available?
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="outlet" id="outlet-check" name="outletCheck">
+            <label class="form-check-label" for="outlet-check">
+              Outlet Available?
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="food" id="food-check" name="foodCheck">
+            <label class="form-check-label" for="food-check">
+              Food Available?
+            </label>
+          </div>
 
-        <div class="form-check form-control">
+          <br>
           <p>Noise Level</p>
           <input type="radio" id="quiet" name="noise" value="quiet">
           <label for="quiet">Usually Quiet</label><br>
           <input type="radio" id="loud" name="noise" value="loud">
           <label for="loud">Potentially Loud</label><br>
-        </div>
 
-        <br>
-        <fieldset>
-          <legend>Add Review</legend>
-          <input type="text" id="text" name="text" value="" class="form-control" placeholder="Add Review Here" required minlength="2" size="60" />
-        </fieldset>
 
-        <br>
-        <label for="nookPhoto" class="form-label">Photo</label>
-        <input type="file" accept="image/*" name="nookPhoto" id="nookPhoto" class="form-control" />
-        <p><button type="submit" class="btn btn-primary mt-3 form-control">Submit</button></p>
-      </form>
+          <br>
+          <fieldset>
+            <p>Add Review</p>
+            <input type="text" id="text" name="text" value="" class="form-control" placeholder="Add Review Here"
+              required minlength="2" size="60" />
+          </fieldset>
 
+          <br>
+          <label for="nookPhoto" class="form-label">Photo</label>
+          <input type="file" accept="image/*" name="nookPhoto" id="nookPhoto" class="form-control" />
+          <p><button type="submit" class="btn btn-primary mt-3 form-control">Submit</button></p>
+        </form>
+      </section>
       <!-- load local js -->
       <script src="/main.js"></script>
 </body>
