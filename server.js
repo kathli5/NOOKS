@@ -356,8 +356,8 @@ app.post('/review/:nookID', async (req, res) => {
     const wifiStatus = () => { return wifi ? "Wi-fi available" : "No wi-fi" }
     const outlet = req.body.outletCheck;
     const outletStatus = () => { return outlet ? "Outlet available" : "No outlet" }
-    const campus = req.body.campusCheck;
-    const foodStatus = () => { return campus ? "Food available" : "No Food" }
+    const food = req.body.foodCheck;
+    const foodStatus = () => { return food ? "Food available" : "No Food" }
     let noise = req.body.noise;
 
     //add reviewID with earliest review being rid= 1
@@ -386,7 +386,13 @@ app.post('/review/:nookID', async (req, res) => {
             { $push: { reviews: review } }
         );
 
-    //update info in nook TODO
+    //update info in nook to reflect tags in most recent review
+    let update = await nooks
+        .updateOne(
+            { nid: { $eq: nookID } },
+            {$set: {tags: [wifiStatus(), outletStatus(), foodStatus(), noise]}}
+        );
+
     req.flash('info', 'Successfully added review!');
     return res.redirect(`/nook/${nookID}`);
 });
