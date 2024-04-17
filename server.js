@@ -80,8 +80,6 @@ var upload = multer({
 // custom routes here
 
 const DB = process.env.USER;
-const WMDB = 'wmdb';
-const STAFF = 'staff';
 const DBNAME = "nooks_db";
 const NOOKS = "nooks";
 const USERS = "users";
