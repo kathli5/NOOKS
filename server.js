@@ -227,14 +227,9 @@ app.get('/add-nook/', async (req, res) => {
 })
 
 app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
-    if (!req.session.username) {
-        req.flash('error', 'You are not logged in - please do so.');
-        return res.redirect("/");
-    }
-
     // Defining variables for nook information from form.
     const poster = req.session.username;
-    const nookName = req.body.name;
+    const nookName = req.body.nookName;
     const address = req.body.nookAddress;
     const rating = req.body.nookRating;
     const numRating = parseInt(rating);
@@ -253,26 +248,30 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
     let latest = await nooks.find().sort({ "nid": -1 }).toArray();
     const id = latest[0].nid + 1;
 
-    console.log(address);
-    console.log(poster);
     console.log(numRating);
 
-    if (address === "" || isNaN(numRating) || !req.file) {
+    if (address === "" || isNaN(numRating)) {
         req.flash('error', 'Please fill out every field.');
         return res.render("nookForm.ejs");
     } else {
         // Updates movie in the database with changed information.
         let insertion = await nooks.insertOne({
             nid: id,
-            nook: nookName,
+            name: nookName,
             address: address,
             poster: poster,
             rating: numRating,
             tags: [wifiStatus(), outletStatus(), campusStatus()],
             reviews: [],
-            photos: '/uploads/' + req.file.filename,
         });
 
+        //uploads photo if photo is uploaded
+        if (req.file) {
+            let photoInsert = await nooks.updateOne(
+                { nid: { $eq: nookID } },
+                { $push: { photos: '/uploads/' + req.file.filename, } }
+            );
+        }
         // Flashes confirmation and re-renders the update page and form.
         req.flash("info", "Your nook has been added.")
         res.redirect("/nook/" + id);
