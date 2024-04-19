@@ -22,7 +22,15 @@
         <form id="review_form" method="POST" action="/review/<%= nook.nid %>">
 
           <label for="nookRating" class="form-label">Rating</label>
-          <input type="text" name="nookRating" id="nookRating" class="form-control" required/>
+          <input type="range" name="nookRating" id="nookRating" class="form-range" min="0" max="5" step="1" list="steplist" />
+          <datalist id="steplist">
+            <option>0</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+        </datalist>
 
           <br>
           <p>Tags</p>

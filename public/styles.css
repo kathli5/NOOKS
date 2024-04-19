@@ -1,8 +1,33 @@
 .pagebody {
-  margin:3em;
+  margin: 3em;
 }
 
 .nook_photos {
-  max-width:90%;
-  max-height:20%;
+  max-width: 90%;
+  max-height: 20%;
+}
+
+input[type="range"] {
+  width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+datalist {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  margin-top: -1em;
+}
+
+option {
+  width: 2ex;
+  display: flex;
+  justify-content: center;
+  height: 42px;
+  align-items: end;
+  height: 4ex;
+  background-position-y: -15px;
+  background-position-x: center;
+  z-index: -1;
 }
