@@ -40,13 +40,15 @@
       </ul>
       <h2>Photos:</h2>
       
-      <ul>
-        <% photos.forEach(elt=> { %>
-          <li>
-            <img class="nook_photos" src="<%= elt %>" alt="Photo of <%= address %>"/>
-          </li>
-          <% }) %>
-      </ul>
+      <% if (photos.length > 0) { %>
+        <ul>
+          <% photos.forEach(elt=> { %>
+            <li>
+              <img class="nook_photos" src="<%= elt %>" alt="Photo of <%= address %>"/>
+            </li>
+            <% }) %>
+        </ul>
+      <% } %>
 
       <form method="GET" action="/get-review">
         <br>
