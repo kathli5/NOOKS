@@ -16,6 +16,9 @@ const cookieSession = require('cookie-session');
 const flash = require('express-flash');
 const multer = require('multer');
 const bcrypt = require('bcrypt');
+require('dotenv').config();
+require('dotenv').config();
+const apiKey = process.env.API_KEY;
 
 // our modules loaded from cwd
 
@@ -229,7 +232,7 @@ app.get('/add-nook/', async (req, res) => {
         req.flash('error', 'You are not logged in - please do so.');
         return res.redirect("/");
     }
-    return res.render('nookForm.ejs');
+    return res.render('nookForm.ejs', {apiKey});
 })
 
 // Adding a new nook to database
@@ -261,7 +264,7 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
 
     if (address === "" || isNaN(numRating)) { //check that address and numRating are filled
         req.flash('error', 'Please fill out every field.');
-        return res.render("nookForm.ejs");
+        return res.render("nookForm.ejs", {apiKey});
     } else {
         // Updates movie in the database with changed information.
         let insertion = await nooks.insertOne({
