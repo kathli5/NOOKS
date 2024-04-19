@@ -347,7 +347,10 @@ app.get('/review/:nookID', async (req, res) => {
 });
 
 //post method for inserting review of nook
-app.post('/review/:nookID', async (req, res) => {
+app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
+    console.log(req.body);
+    console.log(req.file);
+    
     let nookID = req.params.nookID;
     nookID = Number(nookID);
 
@@ -407,12 +410,20 @@ app.post('/review/:nookID', async (req, res) => {
     if (reviews.length == 0) { //if there are no other reviews
         averageRating =  Math.round((nook.rating + rating)/2);
     };
-    console.log(averageRating)
     let updateReview = await nooks
         .updateOne(
             { nid: { $eq: nookID } },
             {$set: {rating: averageRating}}
         );
+    
+    //adds photo to nook document if photo is uploaded
+    let photo = '/uploads/' + req.file.filename;
+    if (req.file) {
+        let photoInsert = await nooks.updateOne(
+            { nid: { $eq: nookID } },
+            { $push: { photos: photo } }
+        );
+    }
     
     req.flash('info', 'Successfully added review!');
     return res.redirect(`/nook/${nookID}`);
