@@ -201,6 +201,9 @@ app.get('/results/', async (req, res) => {
     //searching the database based on form inputs
     let searchResults = [];
     //only searching by tags
+    if(!nookName && searchTags.length == 0){
+        return res.redirect('/all');
+    }
     if (!nookName) {
         console.log("searching without nook name", searchTags);
         searchResults = await nooks.find({ tags: { $all: searchTags } }).toArray();
