@@ -22,7 +22,8 @@
         <form id="review_form" method="POST" action="/review/<%= nook.nid %>">
 
           <label for="nookRating" class="form-label">Rating</label>
-          <input type="range" name="nookRating" id="nookRating" class="form-range" min="0" max="5" step="1" list="steplist" />
+          <input type="range" name="nookRating" id="nookRating" class="form-range" min="0" max="5" step="1"
+            list="steplist" />
           <datalist id="steplist">
             <option>0</option>
             <option>1</option>
@@ -30,25 +31,25 @@
             <option>3</option>
             <option>4</option>
             <option>5</option>
-        </datalist>
+          </datalist>
 
           <br>
           <p>Tags</p>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="wifi" id="wifi-check" name="wifiCheck">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" value="wifi" id="wifi-check" name="wifiCheck">
             <label class="form-check-label" for="wifi-check">
               Wi-Fi Available?
             </label>
           </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="outlet" id="outlet-check" name="outletCheck">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" value="outlet" id="outlet-check" name="outletCheck">
             <label class="form-check-label" for="outlet-check">
               Outlet Available?
             </label>
           </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="food" id="food-check" name="foodCheck">
-            <label class="form-check-label" for="food-check">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" value="outlet" id="food-check" name="foodCheck">
+            <label class="form-check-label" for="outlet-check">
               Food Available?
             </label>
           </div>
