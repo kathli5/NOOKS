@@ -17,7 +17,6 @@ const flash = require('express-flash');
 const multer = require('multer');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
-require('dotenv').config();
 const apiKey = process.env.API_KEY;
 
 // our modules loaded from cwd
@@ -446,7 +445,7 @@ app.get('/map/', (req, res) => {
         return res.redirect("/");
     }
     console.log('map view');
-    return res.render('map.ejs');
+    return res.render('map.ejs', { apiKey: apiKey });
 });
 
 //profile page, currently in progress
