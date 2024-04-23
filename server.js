@@ -204,18 +204,18 @@ app.get('/results/', async (req, res) => {
     //searching the database based on form inputs
     let searchResults = [];
     //only searching by tags
-    if(!nookName && searchTags.length == 0){
+    if (!nookName && searchTags.length == 0) {
         return res.redirect('/all');
     }
     if (!nookName) {
         console.log("searching without nook name", searchTags);
         searchResults = await nooks.find({ tags: { $all: searchTags } }).toArray();
 
-    //only searching by name
+        //only searching by name
     } else if (searchTags.length == 0) {
         searchResults = await nooks.find({ name: { $regex: nookName, $options: 'i' } }).toArray();
-    
-    //searching by both name and tag
+
+        //searching by both name and tag
     } else {
         searchResults = await nooks.find({ name: { $regex: nookName, $options: 'i' }, tags: { $all: searchTags } }).toArray();
     }
@@ -232,7 +232,7 @@ app.get('/add-nook/', async (req, res) => {
         req.flash('error', 'You are not logged in - please do so.');
         return res.redirect("/");
     }
-    return res.render('nookForm.ejs', {apiKey});
+    return res.render('nookForm.ejs', { apiKey });
 })
 
 // Adding a new nook to database
@@ -264,7 +264,7 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
 
     if (address === "" || isNaN(numRating)) { //check that address and numRating are filled
         req.flash('error', 'Please fill out every field.');
-        return res.render("nookForm.ejs", {apiKey});
+        return res.render("nookForm.ejs", { apiKey });
     } else {
         // Updates movie in the database with changed information.
         let insertion = await nooks.insertOne({
@@ -353,7 +353,7 @@ app.get('/review/:nookID', async (req, res) => {
 app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
     console.log(req.body);
     console.log(req.file);
-    
+
     let nookID = req.params.nookID;
     nookID = Number(nookID);
 
@@ -401,24 +401,24 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
     let update = await nooks
         .updateOne(
             { nid: { $eq: nookID } },
-            {$set: {tags: [wifiStatus(), outletStatus(), foodStatus(), noise, campusStatus]}},
+            { $set: { tags: [wifiStatus(), outletStatus(), foodStatus(), noise, campusStatus] } },
         );
-        
+
     //update average rating in nook
     let totalRating = 0;
     reviews.forEach((elem) => {
         totalRating += elem.rating;
     })
-    let averageRating = Math.round(totalRating/reviews.length); 
+    let averageRating = Math.round(totalRating / reviews.length);
     if (reviews.length == 0) { //if there are no other reviews
-        averageRating =  Math.round((nook.rating + rating)/2);
+        averageRating = Math.round((nook.rating + rating) / 2);
     };
     let updateReview = await nooks
         .updateOne(
             { nid: { $eq: nookID } },
-            {$set: {rating: averageRating}}
+            { $set: { rating: averageRating } }
         );
-    
+
     //adds photo to nook document if photo is uploaded
     let photo = '/uploads/' + req.file.filename;
     if (req.file) {
@@ -427,7 +427,7 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
             { $push: { photos: photo } }
         );
     }
-    
+
     req.flash('info', 'Successfully added review!');
     return res.redirect(`/nook/${nookID}`);
 });
@@ -448,6 +448,7 @@ app.get('/map/', (req, res) => {
     console.log('map view');
     return res.render('map.ejs');
 });
+
 //profile page, currently in progress
 app.get('/profile/', async (req, res) => {
     if (!req.session.username) {
@@ -455,7 +456,13 @@ app.get('/profile/', async (req, res) => {
         return res.redirect("/");
     }
     console.log('profile page');
-    return res.render('profile.ejs', { username: req.session.username });
+    const db = await Connection.open(mongoUri, DBNAME);
+    const nooks = db.collection(NOOKS);
+    //get user reviews
+    let userNooks = await nooks.find({'reviews.username': req.session.username}).toArray();
+    console.log(userNooks);
+    return res.render('profile.ejs',
+        { username: req.session.username, userNooks: userNooks });
 });
 
 //retrieves all nooks and lists them on the nooks home page

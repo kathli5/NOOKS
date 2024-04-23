@@ -13,7 +13,15 @@
     <h1>Profile for <%= username %></h1>
 
     <h2>My Reviews</h2>
-    <p>currently under construction</p>
+    <ul>
+        <% userNooks.forEach(nook=> { %>
+            <% nook.reviews.forEach(review => {%>
+                <% if (review.username == username ) { %>
+                    <li><%=review.text%></li>
+                <% } %>
+            <% }) %>
+        <% }) %>
+    </ul>
 
     <p>
         <form action="/logout" method="POST">
