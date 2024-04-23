@@ -168,6 +168,7 @@ app.get('/search/', async (req, res) => {
         req.flash('error', 'You are not logged in. Please log in.');
         return res.redirect("/");
     }
+
     return res.render('search.ejs');
 }
 );
@@ -218,8 +219,17 @@ app.get('/results/', async (req, res) => {
     } else {
         searchResults = await nooks.find({ name: { $regex: nookName, $options: 'i' }, tags: { $all: searchTags } }).toArray();
     }
+
     console.log("RESULTS: ", searchResults);
     await Connection.close();
+
+    //flash, this is currently implemented incorrectly
+    if (searchResults.length == 0){
+        req.flash("Your query doesn't match any of our current nooks")
+        req.flash("Take a look at nooks we have")
+        console.log("results " + searchResults.length);
+        return res.redirect("/all");
+    }
 
     //renders results
     return res.render('results.ejs', { results: searchResults });
