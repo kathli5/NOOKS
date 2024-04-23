@@ -195,14 +195,23 @@ app.get('/results/', async (req, res) => {
     console.log("Searched tags: ", searchTags);
     console.log("Searched name: ", nookName);
 
+
+
     //connecting to MongoDB
     console.log('Connecting to MongoDB:', mongoUri);
     const db = await Connection.open(mongoUri, DBNAME);
     const nooks = db.collection(NOOKS);
     console.log('Connected to MongoDB');
-
     //searching the database based on form inputs
     let searchResults = [];
+
+    //message if the query doesn't match any nooks in the database
+    if (searchResults.length == 0){
+        req.flash("error", "Your query doesn't match any of our current nooks")
+        return res.render("search.ejs");
+    }
+
+
     //only searching by tags
     if (!nookName && searchTags.length == 0) {
         return res.redirect('/all');
@@ -220,16 +229,8 @@ app.get('/results/', async (req, res) => {
         searchResults = await nooks.find({ name: { $regex: nookName, $options: 'i' }, tags: { $all: searchTags } }).toArray();
     }
 
-    console.log("RESULTS: ", searchResults);
+    console.log("RESULTS: ", searchResults.length);
     await Connection.close();
-
-    //flash, this is currently implemented incorrectly
-    if (searchResults.length == 0){
-        req.flash("Your query doesn't match any of our current nooks")
-        req.flash("Take a look at nooks we have")
-        console.log("results " + searchResults.length);
-        return res.redirect("/all");
-    }
 
     //renders results
     return res.render('results.ejs', { results: searchResults });
@@ -312,7 +313,7 @@ app.get('/nook/:nookID', async (req, res) => {
     const db = await Connection.open(mongoUri, DBNAME);
     const nooks = db.collection(NOOKS);
 
-    // Search database for chosen movie and bring it out of array
+    // Search database for chosen nook and bring it out of array
     let chosen = await nooks.find({ nid: { $eq: nookID } }).toArray();
     let nook = chosen[0];
 
@@ -342,7 +343,7 @@ app.get('/review/:nookID', async (req, res) => {
     let nookID = req.params.nookID;
     nookID = Number(nookID);
 
-    // Search database for chosen movie and bring it out of array
+    // Search database for chosen nook and bring it out of array
     const db = await Connection.open(mongoUri, DBNAME);
     const nooks = db.collection(NOOKS);
     let chosen = await nooks.find({ nid: { $eq: nookID } }).toArray();
