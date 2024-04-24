@@ -260,7 +260,17 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
     const campus = req.body.campusCheck;
     const campusStatus = () => { return campus ? "On-campus" : "Off-campus" }
     const food = req.body.foodCheck;
-    const foodStatus = () => { return food ? "Food available" : "No fod available" }
+    const foodStatus = () => { return food ? "Food available" : "No food available" }
+    const noise = req.body.noiseCheck;
+    const noiseStatus = () => {
+        if (noise === "average") {
+            return "Average noisiness";
+        } else if (noise === "quiet") {
+            return "Usually quiet";
+        } else {
+            return "Usually noisy"
+        }
+     }
     const date = new Date();
 
     // Database definitions
@@ -283,7 +293,7 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
             address: address,
             poster: poster,
             rating: numRating,
-            tags: [wifiStatus(), outletStatus(), foodStatus(), campusStatus()],
+            tags: [wifiStatus(), outletStatus(), foodStatus(), campusStatus(), noiseStatus()],
             reviews: [],
         });
 
