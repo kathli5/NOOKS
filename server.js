@@ -87,7 +87,7 @@ const options = {
     apiKey: apiKey,
 };
 
-const geocoder = NodeGeocoder(options);
+const geocoder = coordGeocoder(options);
 
 // ================================================================
 // custom routes here
