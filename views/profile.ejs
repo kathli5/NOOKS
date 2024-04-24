@@ -17,7 +17,12 @@
         <% userNooks.forEach(nook=> { %>
             <% nook.reviews.forEach(review => {%>
                 <% if (review.username == username ) { %>
-                    <li><%=review.text%></li>
+                    <li>
+                        <%=review.text%>
+                        <form method="GET" action="/edit/<%= nook.nid%>/<%= review.rid%>">
+                            <input type="submit" value="Edit review">
+                        </form>
+                    </li>
                 <% } %>
             <% }) %>
         <% }) %>

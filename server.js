@@ -430,8 +430,8 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
         );
 
     //adds photo to nook document if photo is uploaded
-    let photo = '/uploads/' + req.file.filename;
     if (req.file) {
+        let photo = '/uploads/' + req.file.filename;
         let photoInsert = await nooks.updateOne(
             { nid: { $eq: nookID } },
             { $push: { photos: photo } }
@@ -439,6 +439,61 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
     }
 
     req.flash('info', 'Successfully added review!');
+    return res.redirect(`/nook/${nookID}`);
+});
+
+// review page to edit 
+app.get('/edit/:nid/:rid', async (req, res) => {
+    if (!req.session.username) {
+        req.flash('error', 'You are not logged in - please do so.');
+        return res.redirect("/");
+    }
+    const db = await Connection.open(mongoUri, DBNAME);
+    const nooks = db.collection(NOOKS);
+    let nid = parseInt(req.params.nid);
+    let rid = parseInt(req.params.rid);
+
+    let nook = await nooks.findOne({nid: nid});
+    let reviews = nook.reviews;
+    let myReview;
+    reviews.forEach ((review) => {
+        if (review.rid == rid) {
+            myReview = review;
+        }
+    });
+    return res.render('editReview.ejs', {nook: nook, review: myReview});
+})
+
+//updates edited review, currently in progress
+app.post('/edit/:nid/:rid', async (req, res) => {
+    let nookID = req.params.nid;
+    let reviewID = req.params.rid;
+    nookID = Number(nookID);
+
+    // Search database for chosen movie and bring it out of array
+    const db = await Connection.open(mongoUri, DBNAME);
+    const nooks = db.collection(NOOKS);
+
+    //retrieves form data
+    let rating = parseInt(req.body.nookRating);
+    const wifi = req.body.wifiCheck;
+    const wifiStatus = () => { return wifi ? "Wi-fi available" : "No wi-fi" }
+    const outlet = req.body.outletCheck;
+    const outletStatus = () => { return outlet ? "Outlet available" : "No outlet" }
+    const food = req.body.foodCheck;
+    const foodStatus = () => { return food ? "Food available" : "No Food" }
+    let noise = req.body.noise;
+    
+    //update review in database 
+    let update = await nooks
+        .updateOne(
+            {nid: nookID, 'reviews.rid': reviewID},
+            {$set: {'reviews.$.rating': rating,
+                    'reviews.$.tags': [wifiStatus(), outletStatus(), foodStatus(), noise],
+                    'reviews.$.text': req.body.text}
+            }
+        );
+    req.flash('info', 'Successfully updated review!');
     return res.redirect(`/nook/${nookID}`);
 });
 
