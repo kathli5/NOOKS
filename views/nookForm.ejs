@@ -14,7 +14,6 @@
 
 <body>
   <%- include("partials/navbar.ejs") %>
-  <%- include("partials/flashes.ejs") %>
 
     <section class="pagebody">
       <h1>Add Nook</h1>
@@ -59,6 +58,12 @@
             On campus?
           </label>
         </div>
+        <label for="noiseCheck" class="form-label">Noise</label>
+        <select id="noiseCheck" name="noiseCheck" class="form-select" aria-label="Default select example">
+          <option value="average">Average noisiness</option>
+          <option value="quiet">Usually quiet</option>
+          <option value="loud">Usually loud</option>
+        </select>
         
         <label for="nookPhoto" class="form-label">Photo</label>
         <input type="file" accept="image/*" name="nookPhoto" id="nookPhoto" class="form-control" />
