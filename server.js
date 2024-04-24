@@ -16,6 +16,7 @@ const cookieSession = require('cookie-session');
 const flash = require('express-flash');
 const multer = require('multer');
 const bcrypt = require('bcrypt');
+const coordGeocoder = require('node-geocoder');
 require('dotenv').config();
 const apiKey = process.env.API_KEY;
 
@@ -77,6 +78,16 @@ var upload = multer({
     // max fileSize in bytes, causes an ugly error
     limits: { fileSize: 100_000 }
 });
+
+
+//for map view 
+
+const options = {
+    provider: 'google',
+    apiKey: apiKey,
+};
+
+const geocoder = NodeGeocoder(options);
 
 // ================================================================
 // custom routes here
@@ -261,6 +272,9 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
 
     console.log(numRating);
 
+    //geocoding address
+
+
     if (address === "" || isNaN(numRating)) { //check that address and numRating are filled
         req.flash('error', 'Please fill out every field.');
         return res.render("nookForm.ejs", { apiKey });
@@ -270,6 +284,7 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
             nid: id,
             name: nookName,
             address: address,
+            location: geocodedCoords
             poster: poster,
             rating: numRating,
             tags: [wifiStatus(), outletStatus(), foodStatus(), campusStatus()],
@@ -478,6 +493,25 @@ app.get('/all/', async (req, res) => {
     //returns nooks to list them on the list.ejs page
     return res.render('list.ejs', { listDescription: 'All Nooks', list: all });
 });
+
+
+//for adding coords to object
+async function geocodeAddress(address) {
+    try {
+        const res = await geocoder.geocode(address);
+        if (res.length === 0) {
+            throw new Error('No results found for the address.');
+        }
+        return { 
+            latitude: res[0].latitude,
+            longitude: res[0].longitude
+        };
+    } catch (error) {
+        console.error('Error geocoding address:', error);
+        throw error;
+    }
+}
+
 
 // ================================================================
 // postlude
