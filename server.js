@@ -205,12 +205,6 @@ app.get('/results/', async (req, res) => {
     //searching the database based on form inputs
     let searchResults = [];
 
-    //message if the query doesn't match any nooks in the database
-    if (searchResults.length == 0) {
-        req.flash("error", "Your query doesn't match any of our current nooks")
-        return res.render("search.ejs");
-    }
-
 
     //only searching by tags
     if (!nookName && searchTags.length == 0) {
@@ -227,6 +221,12 @@ app.get('/results/', async (req, res) => {
         //searching by both name and tag
     } else {
         searchResults = await nooks.find({ name: { $regex: nookName, $options: 'i' }, tags: { $all: searchTags } }).toArray();
+    }
+
+    //message if the query doesn't match any nooks in the database
+    if (searchResults.length == 0) {
+        req.flash("error", "Your query doesn't match any of our current nooks")
+        return res.render("search.ejs");
     }
 
     console.log("RESULTS: ", searchResults.length);
