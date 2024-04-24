@@ -206,7 +206,7 @@ app.get('/results/', async (req, res) => {
     let searchResults = [];
 
     //message if the query doesn't match any nooks in the database
-    if (searchResults.length == 0){
+    if (searchResults.length == 0) {
         req.flash("error", "Your query doesn't match any of our current nooks")
         return res.render("search.ejs");
     }
@@ -450,25 +450,26 @@ app.get('/edit/:nid/:rid', async (req, res) => {
     }
     const db = await Connection.open(mongoUri, DBNAME);
     const nooks = db.collection(NOOKS);
+    console.log('testing params', req.params.nid);
     let nid = parseInt(req.params.nid);
     let rid = parseInt(req.params.rid);
 
-    let nook = await nooks.findOne({nid: nid});
+    let nook = await nooks.findOne({ nid: nid });
     let reviews = nook.reviews;
     let myReview;
-    reviews.forEach ((review) => {
+    reviews.forEach((review) => {
         if (review.rid == rid) {
             myReview = review;
         }
     });
-    return res.render('editReview.ejs', {nook: nook, review: myReview});
+    return res.render('editReview.ejs', { nook: nook, review: myReview });
 })
 
-//updates edited review, currently in progress
+//updates edited review
 app.post('/edit/:nid/:rid', async (req, res) => {
-    let nookID = req.params.nid;
-    let reviewID = req.params.rid;
-    nookID = Number(nookID);
+    let nid = parseInt(req.params.nid);
+    let rid = parseInt(req.params.rid);
+    console.log('rid', rid);
 
     // Search database for chosen movie and bring it out of array
     const db = await Connection.open(mongoUri, DBNAME);
@@ -483,18 +484,47 @@ app.post('/edit/:nid/:rid', async (req, res) => {
     const food = req.body.foodCheck;
     const foodStatus = () => { return food ? "Food available" : "No Food" }
     let noise = req.body.noise;
-    
+
     //update review in database 
     let update = await nooks
         .updateOne(
-            {nid: nookID, 'reviews.rid': reviewID},
-            {$set: {'reviews.$.rating': rating,
+            { nid: nid, 'reviews.rid': rid },
+            {
+                $set: {
+                    'reviews.$.rating': rating,
                     'reviews.$.tags': [wifiStatus(), outletStatus(), foodStatus(), noise],
-                    'reviews.$.text': req.body.text}
+                    'reviews.$.text': req.body.text
+                }
             }
         );
+
+    //update info in nook to reflect tags in most recent review
+    let nook = await nooks.findOne({ nid: nid });
+    let campusStatus = nook.tags[nook.tags.length - 1] //grab campus status, assume this will be unchanging
+    let updateInfo = await nooks
+        .updateOne(
+            { nid: { $eq: nid } },
+            { $set: { tags: [wifiStatus(), outletStatus(), foodStatus(), noise, campusStatus] } },
+        );
+
+    //update average rating in nook
+    let totalRating = 0;
+    let reviews = nook.reviews;
+    reviews.forEach((elem) => {
+        totalRating += elem.rating;
+    })
+    let averageRating = Math.round(totalRating / reviews.length);
+    if (reviews.length == 0) { //if there are no other reviews
+        averageRating = Math.round((nook.rating + rating) / 2);
+    };
+    let updateReview = await nooks
+        .updateOne(
+            { nid: { $eq: nid } },
+            { $set: { rating: averageRating } }
+        );
+
     req.flash('info', 'Successfully updated review!');
-    return res.redirect(`/nook/${nookID}`);
+    return res.redirect(`/nook/${nid}`);
 });
 
 // redirects you to the review page of the selected nook
@@ -524,8 +554,7 @@ app.get('/profile/', async (req, res) => {
     const db = await Connection.open(mongoUri, DBNAME);
     const nooks = db.collection(NOOKS);
     //get user reviews
-    let userNooks = await nooks.find({'reviews.username': req.session.username}).toArray();
-    console.log(userNooks);
+    let userNooks = await nooks.find({ 'reviews.username': req.session.username }).toArray();
     return res.render('profile.ejs',
         { username: req.session.username, userNooks: userNooks });
 });
