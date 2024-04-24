@@ -462,6 +462,11 @@ app.get('/edit/:nid/:rid', async (req, res) => {
             myReview = review;
         }
     });
+    //check that user is editing their own review
+    if (req.session.username != myReview.username) {
+        req.flash('error', 'Permission denied');
+        return res.redirect("/all");
+    }
     return res.render('editReview.ejs', { nook: nook, review: myReview });
 })
 
