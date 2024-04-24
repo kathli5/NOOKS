@@ -16,6 +16,8 @@ const cookieSession = require('cookie-session');
 const flash = require('express-flash');
 const multer = require('multer');
 const bcrypt = require('bcrypt');
+require('dotenv').config();
+const apiKey = process.env.API_KEY;
 
 // our modules loaded from cwd
 
@@ -166,6 +168,7 @@ app.get('/search/', async (req, res) => {
         req.flash('error', 'You are not logged in. Please log in.');
         return res.redirect("/");
     }
+
     return res.render('search.ejs');
 }
 );
@@ -192,31 +195,41 @@ app.get('/results/', async (req, res) => {
     console.log("Searched tags: ", searchTags);
     console.log("Searched name: ", nookName);
 
+
+
     //connecting to MongoDB
     console.log('Connecting to MongoDB:', mongoUri);
     const db = await Connection.open(mongoUri, DBNAME);
     const nooks = db.collection(NOOKS);
     console.log('Connected to MongoDB');
-
     //searching the database based on form inputs
     let searchResults = [];
+
+    //message if the query doesn't match any nooks in the database
+    if (searchResults.length == 0) {
+        req.flash("error", "Your query doesn't match any of our current nooks")
+        return res.render("search.ejs");
+    }
+
+
     //only searching by tags
-    if(!nookName && searchTags.length == 0){
+    if (!nookName && searchTags.length == 0) {
         return res.redirect('/all');
     }
     if (!nookName) {
         console.log("searching without nook name", searchTags);
         searchResults = await nooks.find({ tags: { $all: searchTags } }).toArray();
 
-    //only searching by name
+        //only searching by name
     } else if (searchTags.length == 0) {
         searchResults = await nooks.find({ name: { $regex: nookName, $options: 'i' } }).toArray();
-    
-    //searching by both name and tag
+
+        //searching by both name and tag
     } else {
         searchResults = await nooks.find({ name: { $regex: nookName, $options: 'i' }, tags: { $all: searchTags } }).toArray();
     }
-    console.log("RESULTS: ", searchResults);
+
+    console.log("RESULTS: ", searchResults.length);
     await Connection.close();
 
     //renders results
@@ -229,7 +242,7 @@ app.get('/add-nook/', async (req, res) => {
         req.flash('error', 'You are not logged in - please do so.');
         return res.redirect("/");
     }
-    return res.render('nookForm.ejs');
+    return res.render('nookForm.ejs', { apiKey });
 })
 
 // Adding a new nook to database
@@ -261,7 +274,7 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
 
     if (address === "" || isNaN(numRating)) { //check that address and numRating are filled
         req.flash('error', 'Please fill out every field.');
-        return res.render("nookForm.ejs");
+        return res.render("nookForm.ejs", { apiKey });
     } else {
         // Updates movie in the database with changed information.
         let insertion = await nooks.insertOne({
@@ -300,7 +313,7 @@ app.get('/nook/:nookID', async (req, res) => {
     const db = await Connection.open(mongoUri, DBNAME);
     const nooks = db.collection(NOOKS);
 
-    // Search database for chosen movie and bring it out of array
+    // Search database for chosen nook and bring it out of array
     let chosen = await nooks.find({ nid: { $eq: nookID } }).toArray();
     let nook = chosen[0];
 
@@ -330,7 +343,7 @@ app.get('/review/:nookID', async (req, res) => {
     let nookID = req.params.nookID;
     nookID = Number(nookID);
 
-    // Search database for chosen movie and bring it out of array
+    // Search database for chosen nook and bring it out of array
     const db = await Connection.open(mongoUri, DBNAME);
     const nooks = db.collection(NOOKS);
     let chosen = await nooks.find({ nid: { $eq: nookID } }).toArray();
@@ -347,7 +360,10 @@ app.get('/review/:nookID', async (req, res) => {
 });
 
 //post method for inserting review of nook
-app.post('/review/:nookID', async (req, res) => {
+app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
+    console.log(req.body);
+    console.log(req.file);
+
     let nookID = req.params.nookID;
     nookID = Number(nookID);
 
@@ -395,27 +411,125 @@ app.post('/review/:nookID', async (req, res) => {
     let update = await nooks
         .updateOne(
             { nid: { $eq: nookID } },
-            {$set: {tags: [wifiStatus(), outletStatus(), foodStatus(), noise, campusStatus]}},
+            { $set: { tags: [wifiStatus(), outletStatus(), foodStatus(), noise, campusStatus] } },
         );
-        
+
     //update average rating in nook
     let totalRating = 0;
     reviews.forEach((elem) => {
         totalRating += elem.rating;
     })
-    let averageRating = Math.round(totalRating/reviews.length); 
+    let averageRating = Math.round(totalRating / reviews.length);
     if (reviews.length == 0) { //if there are no other reviews
-        averageRating =  Math.round((nook.rating + rating)/2);
+        averageRating = Math.round((nook.rating + rating) / 2);
     };
-    console.log(averageRating)
     let updateReview = await nooks
         .updateOne(
             { nid: { $eq: nookID } },
-            {$set: {rating: averageRating}}
+            { $set: { rating: averageRating } }
         );
-    
+
+    //adds photo to nook document if photo is uploaded
+    if (req.file) {
+        let photo = '/uploads/' + req.file.filename;
+        let photoInsert = await nooks.updateOne(
+            { nid: { $eq: nookID } },
+            { $push: { photos: photo } }
+        );
+    }
+
     req.flash('info', 'Successfully added review!');
     return res.redirect(`/nook/${nookID}`);
+});
+
+// review page to edit 
+app.get('/edit/:nid/:rid', async (req, res) => {
+    if (!req.session.username) {
+        req.flash('error', 'You are not logged in - please do so.');
+        return res.redirect("/");
+    }
+    const db = await Connection.open(mongoUri, DBNAME);
+    const nooks = db.collection(NOOKS);
+    console.log('testing params', req.params.nid);
+    let nid = parseInt(req.params.nid);
+    let rid = parseInt(req.params.rid);
+
+    let nook = await nooks.findOne({ nid: nid });
+    let reviews = nook.reviews;
+    let myReview;
+    reviews.forEach((review) => {
+        if (review.rid == rid) {
+            myReview = review;
+        }
+    });
+    //check that user is editing their own review
+    if (req.session.username != myReview.username) {
+        req.flash('error', 'Permission denied');
+        return res.redirect("/all");
+    }
+    return res.render('editReview.ejs', { nook: nook, review: myReview });
+})
+
+//updates edited review
+app.post('/edit/:nid/:rid', async (req, res) => {
+    let nid = parseInt(req.params.nid);
+    let rid = parseInt(req.params.rid);
+    console.log('rid', rid);
+
+    // Search database for chosen movie and bring it out of array
+    const db = await Connection.open(mongoUri, DBNAME);
+    const nooks = db.collection(NOOKS);
+
+    //retrieves form data
+    let rating = parseInt(req.body.nookRating);
+    const wifi = req.body.wifiCheck;
+    const wifiStatus = () => { return wifi ? "Wi-fi available" : "No wi-fi" }
+    const outlet = req.body.outletCheck;
+    const outletStatus = () => { return outlet ? "Outlet available" : "No outlet" }
+    const food = req.body.foodCheck;
+    const foodStatus = () => { return food ? "Food available" : "No Food" }
+    let noise = req.body.noise;
+
+    //update review in database 
+    let update = await nooks
+        .updateOne(
+            { nid: nid, 'reviews.rid': rid },
+            {
+                $set: {
+                    'reviews.$.rating': rating,
+                    'reviews.$.tags': [wifiStatus(), outletStatus(), foodStatus(), noise],
+                    'reviews.$.text': req.body.text
+                }
+            }
+        );
+
+    //update info in nook to reflect tags in most recent review
+    let nook = await nooks.findOne({ nid: nid });
+    let campusStatus = nook.tags[nook.tags.length - 1] //grab campus status, assume this will be unchanging
+    let updateInfo = await nooks
+        .updateOne(
+            { nid: { $eq: nid } },
+            { $set: { tags: [wifiStatus(), outletStatus(), foodStatus(), noise, campusStatus] } },
+        );
+
+    //update average rating in nook
+    let totalRating = 0;
+    let reviews = nook.reviews;
+    reviews.forEach((elem) => {
+        totalRating += elem.rating;
+    })
+    let averageRating = Math.round(totalRating / reviews.length);
+    if (reviews.length == 0) { //if there are no other reviews
+        averageRating = Math.round((nook.rating + rating) / 2);
+    };
+    let updateReview = await nooks
+        .updateOne(
+            { nid: { $eq: nid } },
+            { $set: { rating: averageRating } }
+        );
+
+    req.flash('info', 'Successfully updated review!');
+    return res.redirect(`/nook/${nid}`);
 });
 
 // redirects you to the review page of the selected nook
@@ -432,8 +546,9 @@ app.get('/map/', (req, res) => {
         return res.redirect("/");
     }
     console.log('map view');
-    return res.render('map.ejs');
+    return res.render('map.ejs', { apiKey: apiKey });
 });
+
 //profile page, currently in progress
 app.get('/profile/', async (req, res) => {
     if (!req.session.username) {
@@ -441,7 +556,12 @@ app.get('/profile/', async (req, res) => {
         return res.redirect("/");
     }
     console.log('profile page');
-    return res.render('profile.ejs', { username: req.session.username });
+    const db = await Connection.open(mongoUri, DBNAME);
+    const nooks = db.collection(NOOKS);
+    //get user reviews
+    let userNooks = await nooks.find({ 'reviews.username': req.session.username }).toArray();
+    return res.render('profile.ejs',
+        { username: req.session.username, userNooks: userNooks });
 });
 
 //retrieves all nooks and lists them on the nooks home page

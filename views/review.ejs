@@ -19,11 +19,10 @@
         <h1>Add Review for <%= nook.name %>
         </h1>
 
-        <form id="review_form" method="POST" action="/review/<%= nook.nid %>">
-
+        <form id="review_form" method="POST" action="/review/<%= nook.nid %>" enctype="multipart/form-data">
           <label for="nookRating" class="form-label">Rating</label>
           <input type="range" name="nookRating" id="nookRating" class="form-range" min="0" max="5" step="1"
-            list="steplist" />
+            list="steplist" required />
           <datalist id="steplist">
             <option>0</option>
             <option>1</option>
@@ -42,13 +41,15 @@
             </label>
           </div>
           <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" role="switch" value="outlet" id="outlet-check" name="outletCheck">
+            <input class="form-check-input" type="checkbox" role="switch" value="outlet" id="outlet-check"
+              name="outletCheck">
             <label class="form-check-label" for="outlet-check">
               Outlet Available?
             </label>
           </div>
           <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" role="switch" value="outlet" id="food-check" name="foodCheck">
+            <input class="form-check-input" type="checkbox" role="switch" value="outlet" id="food-check"
+              name="foodCheck">
             <label class="form-check-label" for="outlet-check">
               Food Available?
             </label>
