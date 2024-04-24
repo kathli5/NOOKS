@@ -14,14 +14,13 @@
 
 <body>
   <%- include("partials/navbar.ejs") %>
-  <%- include("partials/flashes.ejs") %>
 
     <section class="pagebody">
       <h1>Add Nook</h1>
 
       <form id="addnook_form" method="POST" action="/add-nook/" enctype="multipart/form-data">
         <label for="nookName" class="form-label">Name of Nook</label>
-        <input type="text" name="nookName" id="nookName" class="form-control" required/>
+        <input type="text" name="nookName" id="nookName" class="form-control" placeholder="Nook Name" required/>
         <label for="nookAddress" class="form-label">Address</label>
         <input type="text" name="nookAddress" id="nookAddress" class="form-control" required />
         <label for="nookRating" class="form-label">Rating</label>
@@ -59,6 +58,12 @@
             On campus?
           </label>
         </div>
+        <label for="noiseCheck" class="form-label">Noise</label>
+        <select id="noiseCheck" name="noiseCheck" class="form-select" aria-label="Default select example">
+          <option value="average">Average noisiness</option>
+          <option value="quiet">Usually quiet</option>
+          <option value="loud">Usually loud</option>
+        </select>
         
         <label for="nookPhoto" class="form-label">Photo</label>
         <input type="file" accept="image/*" name="nookPhoto" id="nookPhoto" class="form-control" />
