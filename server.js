@@ -386,9 +386,6 @@ app.get('/review/:nookID', async (req, res) => {
 
 //post method for inserting review of nook
 app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
-    console.log(req.body);
-    console.log(req.file);
-
     let nookID = req.params.nookID;
     nookID = Number(nookID);
 
@@ -417,7 +414,8 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
     else {
         id = reviews.length + 1;
     }
-    //add review to database 
+
+    //review document
     let review = {
         rid: id,
         username: req.session.username,
@@ -425,6 +423,18 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
         tags: [wifiStatus(), outletStatus(), foodStatus(), noise],
         text: req.body.text
     };
+
+    //adds photo to nook document if photo is uploaded
+    if (req.file) {
+        let photo = '/uploads/' + req.file.filename;
+        let photoInsert = await nooks.updateOne(
+            { nid: { $eq: nookID } },
+            { $push: { photos: photo } }
+        );
+        review['photo'] = photo;
+    }
+
+    //add review document to nooks
     let result = await nooks
         .updateOne(
             { nid: { $eq: nookID } },
@@ -453,15 +463,6 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
             { nid: { $eq: nookID } },
             { $set: { rating: averageRating } }
         );
-
-    //adds photo to nook document if photo is uploaded
-    if (req.file) {
-        let photo = '/uploads/' + req.file.filename;
-        let photoInsert = await nooks.updateOne(
-            { nid: { $eq: nookID } },
-            { $push: { photos: photo } }
-        );
-    }
 
     req.flash('info', 'Successfully added review!');
     return res.redirect(`/nook/${nookID}`);
@@ -554,6 +555,62 @@ app.post('/edit/:nid/:rid', async (req, res) => {
         );
 
     req.flash('info', 'Successfully updated review!');
+    return res.redirect(`/nook/${nid}`);
+});
+
+//deletes user review
+app.post('/delete/:nid/:rid', async (req, res) => {
+    let nid = parseInt(req.params.nid);
+    let rid = parseInt(req.params.rid);
+    console.log('rid', rid);
+
+    // Search database for chosen movie and bring it out of array
+    const db = await Connection.open(mongoUri, DBNAME);
+    const nooks = db.collection(NOOKS);
+
+    //get photo path and deletes from nook
+    let nook = await nooks.findOne({nid: nid});
+    let myReview;
+    nook.reviews.forEach((review) => {
+        if (review.rid == rid) {
+            myReview = review;
+        }
+    });
+    console.log(myReview);
+    let photo;
+    if (myReview.photo) {
+        photo = myReview.photo;
+        let update = await nooks.updateOne(
+                     {nid : nid},
+                     {$pull: {photos: photo}}
+        )
+    }
+    //todo: remove photo file from uploads folder
+
+    //delete review from database
+    let update = await nooks
+        .updateOne(
+            { nid: nid},
+            {$pull: {reviews : {rid: rid}}}
+        );
+
+    //update average rating in nook
+    let totalRating = 0;
+    let reviews = nook.reviews;
+    reviews.forEach((elem) => {
+        totalRating += elem.rating;
+    })
+    let averageRating = Math.round(totalRating / reviews.length);
+    if (reviews.length == 0) { //if there are no other reviews
+        averageRating = Math.round((nook.rating + rating) / 2);
+    };
+    let updateReview = await nooks
+        .updateOne(
+            { nid: { $eq: nid } },
+            { $set: { rating: averageRating } }
+        );
+
+    req.flash('info', 'Successfully deleted review');
     return res.redirect(`/nook/${nid}`);
 });
 

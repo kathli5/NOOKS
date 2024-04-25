@@ -93,7 +93,14 @@
 
             <br>
             <p> Photos: </p>
+            <% if (review.photo) { %>
+                <img class="nook_photos" src="<%= review.photo %>" alt="Photo of <%= nook.name %>"/>
+            <%}%>
             <p><button type="submit" class="btn btn-primary mt-3 form-control">Update Review</button></p>
+        </form>
+
+        <form method="POST" action="/delete/<%= nook.nid %>/<%= review.rid %>">
+            <p><button type="submit" class="btn btn-primary mt-3 form-control">Delete Review</button></p>
         </form>
     </section>
     
