@@ -87,8 +87,8 @@
             <br>
             <fieldset>
                 <p>Edit Review</p>
-                <input type="text" id="text" name="text" value='<%=review.text%>' class="form-control"
-                    placeholder="Add Review Here" required minlength="2" size="60" />
+                <textarea id="text" name="text" class="form-control"
+                    placeholder="Add Review Here" rows="3" cols="40"><%=review.text%></textarea>
             </fieldset>
 
             <br>
@@ -100,12 +100,13 @@
         </form>
 
         <form method="POST" action="/delete/<%= nook.nid %>/<%= review.rid %>">
-            <p><button type="submit" class="btn btn-primary mt-3 form-control">Delete Review</button></p>
+            <p><button id="delete" type="submit" class="btn btn-primary mt-3 form-control">Delete Review</button></p>
         </form>
     </section>
     
     <!-- load local js -->
-    <script src="/main.js"></script>
+    <script src="/main.js"> 
+    </script>
 
 </body>
 
