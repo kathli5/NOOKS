@@ -412,7 +412,10 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
         id = 1
     }
     else {
-        id = reviews.length + 1;
+        let sorted = reviews.sort(function(first, second) {
+            return second.rid - first.rid;
+        })
+        id = sorted[0].rid + 1;
     }
 
     //review document
@@ -488,6 +491,7 @@ app.get('/edit/:nid/:rid', async (req, res) => {
             myReview = review;
         }
     });
+    console.log('myreview', myReview)
     //check that user is editing their own review
     if (req.session.username != myReview.username) {
         req.flash('error', 'Permission denied');
@@ -602,7 +606,7 @@ app.post('/delete/:nid/:rid', async (req, res) => {
     })
     let averageRating = Math.round(totalRating / reviews.length);
     if (reviews.length == 0) { //if there are no other reviews
-        averageRating = Math.round((nook.rating + rating) / 2);
+        averageRating = nook.rating;
     };
     let updateReview = await nooks
         .updateOne(
