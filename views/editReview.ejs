@@ -105,7 +105,16 @@
     </section>
     
     <!-- load local js -->
-    <script src="/main.js"> 
+    <script> 
+
+    $("#delete").click(function (event) {
+        let result = confirm("This will delete your review - are you sure?\nClick OK to continue");
+        if (!result) {
+            event.preventDefault();
+        }
+    })
+
+
     </script>
 
 </body>

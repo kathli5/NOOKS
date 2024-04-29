@@ -31,3 +31,7 @@ option {
   background-position-x: center;
   z-index: -1;
 }
+
+#delete {
+  background-color: red;
+}
