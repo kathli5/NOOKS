@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Node Starter</title>
+    <title>Nooks</title>
     <%- include("partials/imports.ejs") %>
 </head>
 
@@ -46,18 +46,20 @@
         </div>
 
     <div>
-        <p>Location</p>
-        <input type="radio" id="onCampus" name="location" value="On-campus">
-        <label for="on">On Campus</label><br>
-        <input type="radio" id="offCampus" name="location" value="Off-campus">
-        <label for="off">Off Campus</label><br>
+      <label for="location">Location</label>
+      <select id="location" name="location">
+        <option></option>
+        <option value="On-campus">On Campus</option>
+        <option value="Off-campus">Off Campus</option>
+      </select>
     </div>
     <div>
-        <p>Noise Level</p>
-        <input type="radio" id="quiet" name="noise" value="quiet">
-        <label for="quiet">Usually Quiet</label><br>
-        <input type="radio" id="loud" name="noise" value="loud">
-        <label for="loud">Potentially Loud</label><br>
+      <label for="noiseLevel">Noise Level</label>
+      <select id="noiseLevel" name="noise">
+        <option></option>
+        <option value="quiet">Usually Quiet</option>
+        <option value="loud">Potentially Loud</option>
+      </select>
     </div>
       
   </fieldset>
