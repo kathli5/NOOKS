@@ -16,12 +16,26 @@
 
 <script>
 function myMap() {
-var mapProp= {
+var mapProps= {
   center:new google.maps.LatLng( 42.295567, -71.309726),
   zoom:10,
 };
-var map = new google.maps.Map(document.getElementById("googleMap"),mapProp);
+var map = new google.maps.Map(document.getElementById("googleMap"),mapProps);
+var markers =  new google.maps.Marker({
+    position: new google.maps.LatLng(42.295567, -71.309726),
+    map,
+    title: "Hello World!",
+  });
+  var infoWindow = new google.maps.InfoWindow({
+    content: "<p>Nook Title</p>"
+  });
+
+  markers.addListener("click", function() {
+    infoWindow.open(map, markers);
+  });
 }
+
+
 </script>
 
 <script src="https://maps.googleapis.com/maps/api/js?key=<%= apiKey %>&callback=myMap"></script>
