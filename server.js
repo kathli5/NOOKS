@@ -310,6 +310,7 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
             rating: numRating,
             tags: [wifiStatus(), outletStatus(), foodStatus(), campusStatus(), noiseStatus()],
             reviews: [],
+            photos:[],
         });
 
         //adds photo to nook document if photo is uploaded
