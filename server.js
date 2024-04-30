@@ -686,10 +686,21 @@ app.get('/profile/', async (req, res) => {
     console.log('profile page');
     const db = await Connection.open(mongoUri, DBNAME);
     const nooks = db.collection(NOOKS);
+    let userLikes = await db.collection(USERS).find({username:req.session.username}).toArray();
+    userLikes = userLikes[0];
+
     //get user reviews
+    const allNooks = await db.collection(NOOKS).find().toArray();
+    let userLikesNooks = [];
+    allNooks.forEach((nook) => {
+        if (String(nook.nid) in userLikes.likes) {
+            userLikesNooks.push(nook);
+        }
+    })
+
     let userNooks = await nooks.find({ 'reviews.username': req.session.username }).toArray();
     return res.render('profile.ejs',
-        { username: req.session.username, userNooks: userNooks });
+        { username: req.session.username, userNooks: userNooks, userLikes: userLikesNooks });
 });
 
 /**
@@ -706,7 +717,6 @@ app.get('/all/', async (req, res) => {
     liked = liked[0].likes;
     
     // console.log('len', all.length, 'first', all[0]);
-    console.log("AAAAAAAAA", liked);
     console.log('all nooks');
     await Connection.close();
     //returns nooks to list them on the list.ejs page

@@ -28,6 +28,13 @@
         <% }) %>
     </ul>
 
+    <h2>Favorite Nooks</h2>
+    <ul>
+        <% userLikes.forEach(like=> { %>
+            <li><a href="<%='http://localhost:8984/nook/' + like.nid%>"><%= like.name %></a></li>
+        <% }) %>
+    </ul>
+
     <p>
         <form action="/logout" method="POST">
           <button>Logout <%= username %></button>
