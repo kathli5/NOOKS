@@ -702,12 +702,15 @@ app.get('/all/', async (req, res) => {
     }
     const db = await Connection.open(mongoUri, DBNAME);
     let all = await db.collection(NOOKS).find().toArray();
-    let liked = await db.collection()
-    console.log('len', all.length, 'first', all[0]);
+    let liked = await db.collection(USERS).find({username:req.session.username}).toArray();
+    liked = liked[0].likes;
+    
+    // console.log('len', all.length, 'first', all[0]);
+    console.log("AAAAAAAAA", liked);
     console.log('all nooks');
     await Connection.close();
     //returns nooks to list them on the list.ejs page
-    return res.render('list.ejs', { listDescription: 'All Nooks', list: all, user:req.session.username });
+    return res.render('list.ejs', { listDescription: 'All Nooks', list: all, likes: liked });
 });
 
 
@@ -744,7 +747,6 @@ app.post('/like/:nid', async (req, res) => {
     if (!('likes' in userfind[0])) {
         const addlikes = await db.collection(USERS).updateOne({ username: req.session.username }, { $set: { likes: {} } });
         userfind = await db.collection(USERS).find({ username: req.session.username }).toArray()
-        console.log(userfind)
     }
 
     if (nid in userfind[0].likes) {
