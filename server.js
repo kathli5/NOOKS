@@ -18,7 +18,7 @@ const multer = require('multer');
 const bcrypt = require('bcrypt');
 const coordGeocoder = require('node-geocoder');
 require('dotenv').config();
-const apiKey = process.env.API_KEY;
+const apiKey = AIzaSyD_i0v65GU6owvHnlwZm3Ip5E-GgWMozOg;
 
 // our modules loaded from cwd
 
