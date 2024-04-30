@@ -629,7 +629,10 @@ app.get('/get-review/', async (req, res) => {
     return res.redirect(`/review/${nid}`);
 })
 
-//map page, currently in progress
+/**when users navigate to the map page, this route renders map.ejs passing the apikey
+ * eventually it will also pass an array of all the titles and coordinates of nooks
+ * to be placed as markers on the map
+ **/
 app.get('/map/', (req, res) => {
     if (!req.session.username) {
         req.flash('error', 'You are not logged in - please do so.');
