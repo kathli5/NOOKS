@@ -305,7 +305,6 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
             nid: id,
             name: nookName,
             address: address,
-            location: geocodedCoords,
             poster: poster,
             rating: numRating,
             tags: [wifiStatus(), outletStatus(), foodStatus(), campusStatus(), noiseStatus()],
