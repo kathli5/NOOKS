@@ -764,12 +764,6 @@ app.post('/like/:nid', async (req, res) => {
     let userfind = await db.collection(USERS).find({ username: req.session.username }).toArray();
     let change;
 
-    // adds likes field to the user if current user doesn't have it already
-    if (!('likes' in userfind[0])) {
-        const addlikes = await db.collection(USERS).updateOne({ username: req.session.username }, { $set: { likes: {} } });
-        userfind = await db.collection(USERS).find({ username: req.session.username }).toArray()
-    }
-
     // if the nook is in the user likes, then remove the like from the user and decrement total likes.
     // otherwise, add the like to the user and increment total likes
     if (nid in userfind[0].likes) {
