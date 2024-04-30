@@ -566,7 +566,6 @@ app.post('/edit/:nid/:rid', async (req, res) => {
 app.post('/delete/:nid/:rid', async (req, res) => {
     let nid = parseInt(req.params.nid);
     let rid = parseInt(req.params.rid);
-    console.log('rid', rid);
 
     // Search database for chosen movie and bring it out of array
     const db = await Connection.open(mongoUri, DBNAME);
@@ -574,22 +573,26 @@ app.post('/delete/:nid/:rid', async (req, res) => {
 
     //get photo path and deletes from nook
     let nook = await nooks.findOne({nid: nid});
-    let myReview;
+    let myReview; 
     nook.reviews.forEach((review) => {
         if (review.rid == rid) {
             myReview = review;
         }
     });
-    console.log(myReview);
-    let photo;
+    let photo; 
     if (myReview.photo) {
-        photo = myReview.photo;
+        photo = myReview.photo; //photo path
+        //remove photo file from uploads folder
+        var fs = require('fs');
+        fs.unlink('.'+photo, function(err) {
+            if (err) { return console.error(err)}
+        });
+        //remove photo from nook document
         let update = await nooks.updateOne(
                      {nid : nid},
                      {$pull: {photos: photo}}
         )
     }
-    //todo: remove photo file from uploads folder
 
     //delete review from database
     let update = await nooks
