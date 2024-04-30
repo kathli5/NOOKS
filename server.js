@@ -294,7 +294,7 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
         } else {
             return "Usually noisy"
         }
-     }
+    }
     const date = new Date();
 
     // Database definitions
@@ -322,7 +322,8 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
             rating: numRating,
             tags: [wifiStatus(), outletStatus(), foodStatus(), campusStatus(), noiseStatus()],
             reviews: [],
-            photos:[],
+            photos: [],
+            likes: 0
         });
 
         //adds photo to nook document if photo is uploaded
@@ -436,7 +437,7 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
         id = 1
     }
     else {
-        let sorted = reviews.sort(function(first, second) {
+        let sorted = reviews.sort(function (first, second) {
             return second.rid - first.rid;
         })
         id = sorted[0].rid + 1;
@@ -604,33 +605,33 @@ app.post('/delete/:nid/:rid', async (req, res) => {
     const nooks = db.collection(NOOKS);
 
     //get photo path and deletes from nook
-    let nook = await nooks.findOne({nid: nid});
-    let myReview; 
+    let nook = await nooks.findOne({ nid: nid });
+    let myReview;
     nook.reviews.forEach((review) => {
         if (review.rid == rid) {
             myReview = review;
         }
     });
-    let photo; 
+    let photo;
     if (myReview.photo) {
         photo = myReview.photo; //photo path
         //remove photo file from uploads folder
         var fs = require('fs');
-        fs.unlink('.'+photo, function(err) {
-            if (err) { return console.error(err)}
+        fs.unlink('.' + photo, function (err) {
+            if (err) { return console.error(err) }
         });
         //remove photo from nook document
         let update = await nooks.updateOne(
-                     {nid : nid},
-                     {$pull: {photos: photo}}
+            { nid: nid },
+            { $pull: { photos: photo } }
         )
     }
 
     //delete review from database
     let update = await nooks
         .updateOne(
-            { nid: nid},
-            {$pull: {reviews : {rid: rid}}}
+            { nid: nid },
+            { $pull: { reviews: { rid: rid } } }
         );
 
     //update average rating in nook
@@ -701,11 +702,15 @@ app.get('/all/', async (req, res) => {
     }
     const db = await Connection.open(mongoUri, DBNAME);
     let all = await db.collection(NOOKS).find().toArray();
-    console.log('len', all.length, 'first', all[0]);
+    let liked = await db.collection(USERS).find({username:req.session.username}).toArray();
+    liked = liked[0].likes;
+    
+    // console.log('len', all.length, 'first', all[0]);
+    console.log("AAAAAAAAA", liked);
     console.log('all nooks');
     await Connection.close();
     //returns nooks to list them on the list.ejs page
-    return res.render('list.ejs', { listDescription: 'All Nooks', list: all });
+    return res.render('list.ejs', { listDescription: 'All Nooks', list: all, likes: liked });
 });
 
 
@@ -716,7 +721,7 @@ async function geocodeAddress(address) {
         if (res.length === 0) {
             throw new Error('No results found for the address.');
         }
-        return { 
+        return {
             latitude: res[0].latitude,
             longitude: res[0].longitude
         };
@@ -725,6 +730,50 @@ async function geocodeAddress(address) {
         throw error;
     }
 }
+
+app.post('/like/:nid', async (req, res) => {
+    if (!req.session.username) {
+        req.flash('error', 'You are not logged in - please do so.');
+        return res.redirect("/");
+    }
+
+    const nid = parseInt(req.params.nid);
+
+    const db = await Connection.open(mongoUri, DBNAME);
+    let userfind = await db.collection(USERS).find({ username: req.session.username }).toArray();
+    let change;
+    console.log(userfind)
+
+    if (!('likes' in userfind[0])) {
+        const addlikes = await db.collection(USERS).updateOne({ username: req.session.username }, { $set: { likes: {} } });
+        userfind = await db.collection(USERS).find({ username: req.session.username }).toArray()
+    }
+
+    if (nid in userfind[0].likes) {
+        const userres = await db.collection(USERS).updateOne({ username: req.session.username },
+            { $unset: { [`likes.${nid}`]: 1 } },
+            { upsert: false });
+
+        const result = await db.collection(NOOKS).updateOne({ nid: nid },
+            { $inc: { likes: -1 } },
+            { upsert: false });
+        change = false;
+    } else {
+        const userres = await db.collection(USERS).updateOne({ username: req.session.username },
+            { $set: { [`likes.${nid}`]: true } },
+            { upsert: false });
+
+        const result = await db.collection(NOOKS).updateOne({ nid: nid },
+            { $inc: { likes: 1 } },
+            { upsert: false });
+        change = true;
+    }
+
+    const likes = await db.collection(NOOKS).find({nid:nid}).toArray()
+    console.log(likes)
+
+    return res.json({ change: change, nid: nid, likes: likes[0].likes});
+})
 
 
 // ================================================================
