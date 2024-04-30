@@ -11,9 +11,13 @@
     <%- include("partials/navbar.ejs") %>
         <section class="pagebody container">
             <h1>List of <%= listDescription %>
+            <br><br>
             </h1>
                 <div class="row ">
+
                 <% list.forEach( (elt)=> {%>
+
+
                         <div class="col">
                          <div class="card" style="width:250px;">
                                     <!--if there is no photo upload a preset blank-->
@@ -22,7 +26,7 @@
                                 <h5 class="card-text">
                                 <a href="<%='/nook/'+elt.nid %>""><%= elt.name %></a></h5>
                                 </div>
-                            </div>
+                            </div><br><br>
                         </div>
 
                         <% }); %>

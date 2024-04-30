@@ -76,7 +76,7 @@ var storage = multer.diskStorage({
 var upload = multer({
     storage: storage,
     // max fileSize in bytes, causes an ugly error
-    limits: { fileSize: 100_000 }
+    limits: { fileSize: 200_000_000 }
 });
 
 
