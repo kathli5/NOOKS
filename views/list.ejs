@@ -12,21 +12,38 @@
         <section class="pagebody container">
             <h1>List of <%= listDescription %>
             </h1>
-                <div class="row ">
+            <div class="row ">
                 <% list.forEach( (elt)=> {%>
-                        <div class="col">
-                         <div class="card" style="width:250px;">
-                                    <!--if there is no photo upload a preset blank-->
-                            <img class="card-img-top" src="<%=elt.photos%>" alt="<%=elt.name%>">
-                            <div class="card-body">
-                                <h5 class="card-text">
-                                <a href="<%='/nook/'+elt.nid %>""><%= elt.name %></a></h5>
+                    <div class="col mb-5">
+                        <div class="card" style="width:20em;">
+                            <!--if there is no photo upload a preset blank-->
+                            <% if (elt.photos.length===0) { %>
+                                <img class="card-img-top" src="https://ralfvanveen.com/wp-content/uploads/2021/06/Placeholder-_-Glossary.svg" alt="No image available">
+                                <%} else {%>
+                                    <img class="card-img-top" src="<%=elt.photos%>" alt="<%=elt.name%>">
+                                    <% } %>
+                                        <div class="card-body">
+                                            <h5 class="card-text">
+                                                <a href="<%='/nook/'+elt.nid %>""><%= elt.name %></a></h5>
                                 </div>
-                            </div>
+                            
+                            <div class=" card-footer text-end">
+                                                   <span class="numlikes"><%=elt.likes%></span>
+                                                        <button class="likebutton <%=elt.nid%>" type="button">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                                                height="16" fill="currentColor" class="bi bi-heart"
+                                                                viewBox="0 0 16 16">
+                                                                <path
+                                                                    d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15" />
+                                                            </svg>
+                                                        </button>
+                                
+                                        </div>
                         </div>
-                        <% }); %>
-                     </div> 
-                     
+                    </div>
+                    <% }); %>
+            </div>
+
 
         </section>
 

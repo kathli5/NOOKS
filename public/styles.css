@@ -35,3 +35,8 @@ option {
 #delete {
   background-color: red;
 }
+
+.likebutton {
+  border:none;
+  background: transparent;
+}
