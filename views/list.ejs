@@ -11,9 +11,12 @@
     <%- include("partials/navbar.ejs") %>
         <section class="pagebody container">
             <h1>List of <%= listDescription %>
+            <br><br>
             </h1>
             <div class="row ">
                 <% list.forEach( (elt)=> {%>
+
+
                     <div class="col mb-5">
                         <div class="card" style="width:20em;">
                             <!--if there is no photo upload a preset blank-->
