@@ -97,13 +97,16 @@ const DBNAME = "nooks_db";
 const NOOKS = "nooks";
 const USERS = "users";
 
-// main page. This shows the use of session cookies
+/**
+ * Main page. Prompts user to login or create a login
+ */
 app.get('/', (req, res) => {
-    let uid = req.session.uid || 'unknown';
-    return res.render('index.ejs', { uid });
+    return res.render('index.ejs');
 });
 
-//Adding a new user. Adds username and password to user collection
+/**
+ * Adding a new user. Adds username and password to user collection
+ */
 app.post("/join", async (req, res) => {
     try {
         const username = req.body.username;
@@ -130,7 +133,9 @@ app.post("/join", async (req, res) => {
     }
 });
 
-//Logging in existing user. 
+/**
+ * Logging in existing user. 
+ */
 app.post("/login", async (req, res) => {
     try {
         const username = req.body.username;
@@ -159,7 +164,9 @@ app.post("/login", async (req, res) => {
     }
 });
 
-//Logging out user
+/**
+ * Logging out user
+ */
 app.post('/logout', (req, res) => {
     if (req.session.username) {
         req.session.username = null;
@@ -172,19 +179,21 @@ app.post('/logout', (req, res) => {
     }
 });
 
-// Search page for existing Nooks
+/**
+ * Search page for existing Nooks
+ */
 app.get('/search/', async (req, res) => {
     // Checks if user is logged in
     if (!req.session.username) {
         req.flash('error', 'You are not logged in. Please log in.');
         return res.redirect("/");
     }
-
     return res.render('search.ejs');
-}
-);
+});
 
-// Results page for search results
+/**
+ * Results page for search results
+ */
 app.get('/results/', async (req, res) => {
     console.log('Getting search results');
 
@@ -247,7 +256,9 @@ app.get('/results/', async (req, res) => {
     return res.render('results.ejs', { results: searchResults });
 });
 
-// Page to add nook
+/**
+ * Page to add nook
+ */
 app.get('/add-nook/', async (req, res) => {
     if (!req.session.username) {
         req.flash('error', 'You are not logged in - please do so.');
@@ -256,7 +267,9 @@ app.get('/add-nook/', async (req, res) => {
     return res.render('nookForm.ejs', { apiKey });
 })
 
-// Adding a new nook to database
+/**
+ * Adding a new nook to database
+ */
 app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
     // Defining variables for nook information from form.
     const poster = req.session.username;
@@ -326,7 +339,11 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
     }
 });
 
-// Individual nook page
+/**
+ * Individual nook page
+ * Displays average rating, tags, reviews, photos, and 
+ * button to leave review
+ */
 app.get('/nook/:nookID', async (req, res) => {
     if (!req.session.username) {
         req.flash('error', 'You are not logged in - please do so.');
@@ -360,7 +377,11 @@ app.get('/nook/:nookID', async (req, res) => {
     }
 });
 
-//review page of the selected nook
+/**
+ * Review page of the selected nook
+ * Prompts user to leave rating, mark tags, add review, and upload photo.
+ * Rating and review is required. Photo is optional. 
+ */
 app.get('/review/:nookID', async (req, res) => {
     if (!req.session.username) {
         req.flash('error', 'You are not logged in - please do so.');
@@ -385,7 +406,10 @@ app.get('/review/:nookID', async (req, res) => {
     }
 });
 
-//post method for inserting review of nook
+/**
+ * Post method for inserting review of nook.
+ * Average rating of review is updated.
+ */
 app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
     let nookID = req.params.nookID;
     nookID = Number(nookID);
@@ -472,7 +496,10 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
     return res.redirect(`/nook/${nookID}`);
 });
 
-// review page to edit 
+/**
+ * Page to edit a review.
+ * Form pre-populates with previous review information.
+ */
 app.get('/edit/:nid/:rid', async (req, res) => {
     if (!req.session.username) {
         req.flash('error', 'You are not logged in - please do so.');
@@ -501,7 +528,9 @@ app.get('/edit/:nid/:rid', async (req, res) => {
     return res.render('editReview.ejs', { nook: nook, review: myReview });
 })
 
-//updates edited review
+/**
+ * Update database with edited review
+ */
 app.post('/edit/:nid/:rid', async (req, res) => {
     let nid = parseInt(req.params.nid);
     let rid = parseInt(req.params.rid);
@@ -563,7 +592,10 @@ app.post('/edit/:nid/:rid', async (req, res) => {
     return res.redirect(`/nook/${nid}`);
 });
 
-//deletes user review
+/**
+ * Deletes user review from database.
+ * If there is a photo, it is deleted from uploads folder
+ */
 app.post('/delete/:nid/:rid', async (req, res) => {
     let nid = parseInt(req.params.nid);
     let rid = parseInt(req.params.rid);
@@ -622,10 +654,11 @@ app.post('/delete/:nid/:rid', async (req, res) => {
     return res.redirect(`/nook/${nid}`);
 });
 
-// redirects you to the review page of the selected nook
+/**
+ * Redirects to the review page of the selected nook
+ */
 app.get('/get-review/', async (req, res) => {
     let nid = parseInt(req.query.nid);
-    console.log(nid);
     return res.redirect(`/review/${nid}`);
 })
 
@@ -642,7 +675,9 @@ app.get('/map/', (req, res) => {
     return res.render('map.ejs', { apiKey: apiKey });
 });
 
-//profile page, currently in progress
+/**
+ * Profile page, consisting of user reviews and logout button
+ */
 app.get('/profile/', async (req, res) => {
     if (!req.session.username) {
         req.flash('error', 'You are not logged in - please do so.');
@@ -657,7 +692,9 @@ app.get('/profile/', async (req, res) => {
         { username: req.session.username, userNooks: userNooks });
 });
 
-//retrieves all nooks and lists them on the nooks home page
+/**
+ * retrieves all nooks and lists them on the nooks home page
+ */
 app.get('/all/', async (req, res) => {
     if (!req.session.username) {
         req.flash('error', 'You are not logged in - please do so.');
