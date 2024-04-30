@@ -691,7 +691,9 @@ app.get('/profile/', async (req, res) => {
 
     //get user reviews
     const allNooks = await db.collection(NOOKS).find().toArray();
-    let userLikesNooks = [];
+    let userLikesNooks = []; // the nooks liked by the current user
+
+    // for each nook, check whether the nook is in the user's likes or not. if it is, add it to the array
     allNooks.forEach((nook) => {
         if (String(nook.nid) in userLikes.likes) {
             userLikesNooks.push(nook);
@@ -714,6 +716,11 @@ app.get('/all/', async (req, res) => {
     const db = await Connection.open(mongoUri, DBNAME);
     let all = await db.collection(NOOKS).find().toArray();
     let liked = await db.collection(USERS).find({username:req.session.username}).toArray();
+
+    if (!("likes" in liked[0])) {
+        let addlikes = await db.collection(USERS).updateOne({username: req.session.username}, {$set: {"likes": {}}});
+        liked = await db.collection(USERS).find({username:req.session.username}).toArray();
+    }
     liked = liked[0].likes;
     
     // console.log('len', all.length, 'first', all[0]);
@@ -741,6 +748,10 @@ async function geocodeAddress(address) {
     }
 }
 
+/**
+ * Likes or unlikes a nook by either adding it to the current user and incrementing the nook likes,
+ * or removing it from the current user and decrementing the nook likes.
+ */
 app.post('/like/:nid', async (req, res) => {
     if (!req.session.username) {
         req.flash('error', 'You are not logged in - please do so.');
@@ -752,13 +763,15 @@ app.post('/like/:nid', async (req, res) => {
     const db = await Connection.open(mongoUri, DBNAME);
     let userfind = await db.collection(USERS).find({ username: req.session.username }).toArray();
     let change;
-    console.log(userfind)
 
+    // adds likes field to the user if current user doesn't have it already
     if (!('likes' in userfind[0])) {
         const addlikes = await db.collection(USERS).updateOne({ username: req.session.username }, { $set: { likes: {} } });
         userfind = await db.collection(USERS).find({ username: req.session.username }).toArray()
     }
 
+    // if the nook is in the user likes, then remove the like from the user and decrement total likes.
+    // otherwise, add the like to the user and increment total likes
     if (nid in userfind[0].likes) {
         const userres = await db.collection(USERS).updateOne({ username: req.session.username },
             { $unset: { [`likes.${nid}`]: 1 } },
@@ -779,9 +792,10 @@ app.post('/like/:nid', async (req, res) => {
         change = true;
     }
 
+    // grabs the nook being liked or unliked
     const likes = await db.collection(NOOKS).find({nid:nid}).toArray()
-    console.log(likes)
 
+    // returns true if it's a like, false if it's an unlike, along with the updated number of likes for the nook
     return res.json({ change: change, nid: nid, likes: likes[0].likes});
 })
 
