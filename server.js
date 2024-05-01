@@ -320,7 +320,7 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
             address: address,
             poster: poster,
             rating: numRating,
-            tags: [wifiStatus(), outletStatus(), foodStatus(), campusStatus(), noiseStatus()],
+            tags: [wifiStatus(), outletStatus(), foodStatus(), noiseStatus(), campusStatus()],
             reviews: [],
             photos: [],
             likes: 0
