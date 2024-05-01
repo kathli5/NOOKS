@@ -4,7 +4,7 @@
 This is the github repository for NOOKS, an app created by Alyssa Lima, Thea Feldgoise, Anna Zhou and Katherine Li. The goal of NOOKS is to create a community collection of study spaces, by and for Wellesley students! This app allows users to search, add, review and favorite study spaces in and around Wellesley. 
 
 **Alpha Version: Features Still in Progress**
-- Map View: pinning nook locations on to the map, with clickable info windows that bring the user to the nook page.
+- Map View: pinning nook locations on to the map, with clickable info windows that bring the user to the nook page. Also fixing WAVE errors on map features.
 - Standardizing noise level language, and the way it appears in the search, add nook, and review forms.
 - Creating boxes for reviews, to display more info besides the comment
 - Adding more CSS styling to pages
