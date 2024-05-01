@@ -33,7 +33,8 @@ option {
 }
 
 #delete {
-  background-color: red;
+  background-color: lightpink;
+  color:black;
 }
 
 .likebutton {

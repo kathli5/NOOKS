@@ -32,7 +32,7 @@
                             
                             <div class=" card-footer text-end">
                                                    <span class="numlikes"><%=elt.likes%></span>
-                                                        <button class="likebutton <%=elt.nid%>" type="button">
+                                                        <button aria-label="likeButton" class="likebutton <%=elt.nid%>" type="button">
                                                             <% if (!(parseInt(elt.nid) in likes)) { %>
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="16"
                                                                 height="16" fill="currentColor" class="bi bi-heart"
