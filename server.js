@@ -267,6 +267,31 @@ app.get('/add-nook/', async (req, res) => {
     return res.render('nookForm.ejs', { apiKey });
 })
 
+
+//for adding coords to object
+async function geocodeAddress(address) {
+    console.log(address)
+    try {
+        const res = await geocoder.geocode(address);
+        if (res.length === 0) {
+            throw new Error('No results found for the address.');
+        }
+        console.log({
+            lat: res[0].latitude,
+            lng: res[0].longitude
+        });
+        return ({
+            lat: res[0].latitude,
+            lng: res[0].longitude
+        });
+      console.log()
+    } catch (error) {
+        console.error('Error geocoding address:', error);
+        throw error;
+    }
+}
+
+
 /**
  * Adding a new nook to database
  */
@@ -295,6 +320,8 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
             return "Usually noisy"
         }
     }
+    const coords = await geocodeAddress(address)
+    console.log('coords are', coords)
     const date = new Date();
 
     // Database definitions
@@ -320,6 +347,7 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
             address: address,
             poster: poster,
             rating: numRating,
+            latLng: coords,
             tags: [wifiStatus(), outletStatus(), foodStatus(), noiseStatus(), campusStatus()],
             reviews: [],
             photos: [],
@@ -666,13 +694,20 @@ app.get('/get-review/', async (req, res) => {
  * eventually it will also pass an array of all the titles and coordinates of nooks
  * to be placed as markers on the map
  **/
-app.get('/map/', (req, res) => {
+app.get('/map/', async (req, res) => {
     if (!req.session.username) {
         req.flash('error', 'You are not logged in - please do so.');
         return res.redirect("/");
     }
     console.log('map view');
-    return res.render('map.ejs', { apiKey: apiKey });
+    const db = await Connection.open(mongoUri, DBNAME);
+    var allNooks = await db.collection(NOOKS).find({}).toArray();
+    var allNooks = allNooks.filter(nook => nook.latLng);
+    var allNooks = JSON.stringify(allNooks);
+
+    //allNooks = [allNooks.at(-1)];
+    console.log(allNooks);
+    return res.render('map.ejs', { apiKey: apiKey, allNooks: allNooks });
 });
 
 /**

@@ -1,53 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <title>Nooks</title>
     <%- include("partials/imports.ejs") %>
 </head>
+
 <body>
 
     <%- include("partials/navbar.ejs") %>
-    <section class="pagebody">
+        <section class="pagebody">
 
-    <h1>MAP</h1>
+            <h1>MAP</h1>
 
-<div id="googleMap" style="width:100%;height:400px;"></div>
+            <div id="googleMap" style="width:100%;height:800px;" alt="google map"></div>
+            
+            <script>
+                var nooks = JSON.parse('<%- allNooks %>')
+                console.log("nooks:", nooks);
+            </script>
+            <script>
+                
+                /**
+                 * This function generates the map and markers
+                 * @return Google map projection with clickable nook markers.
+                 * **/
+                function myMap() {
+                    var mapProps = {
+                        center: new google.maps.LatLng(42.295567, -71.309726),
+                        zoom: 10,
+                    };
+                    var infoWindow = new google.maps.InfoWindow();
+                    //initialize map
+                    var map = new google.maps.Map(document.getElementById("googleMap"), mapProps);
+                    //initialize markers
+                    var markers = [];
 
-<script>
+                    //var nooks = [{latLng:{ latitude: 42.3256208, longitude: -71.25918589999999 }, title: '1'}, {latLng: {latitude: 42.324080, longitude:-71.263210}, title: '2'}]
+                    nooks.forEach(nook => {
+                        if (nook.latLng && nook.latLng.latitude && nook.latLng.longitude) {
+                            console.log(nook);
+                            var marker = new google.maps.Marker({
+                                position: new google.maps.LatLng(nook.latLng.latitude, nook.latLng.longitude),
+                                map: map,
+                                title: nook.name
+                            });
+                            marker.addListener("click", function () {
+                                infoWindow.setContent("<p><a href='/nook/" + nook.nid + "'>" + nook.name + "</a></p>");
+                                infoWindow.open(map, marker);
+                            });
+                            markers.push(marker);
+                        }
+                    });
 
-/**
- * This function generates the map and markers
- * @return Google map projection with clickable nook markers.
- * **/
-function myMap() {
-var mapProps= {
-  center:new google.maps.LatLng( 42.295567, -71.309726),
-  zoom:10,
-};
-//initialize map
-var map = new google.maps.Map(document.getElementById("googleMap"),mapProps);
-//initialize markers
-var markers =  new google.maps.Marker({
-    position: new google.maps.LatLng(42.295567, -71.309726),
-    map,
-    title: "Nook Title",
-  });
+                }
+            </script>
 
-  //popup information window
-  var infoWindow = new google.maps.InfoWindow({
-    content: "<p>Nook Title</p>"
-  });
-  //event handler for clicking on a marker
-  markers.addListener("click", function() {
-    infoWindow.open(map, markers);
-  });
-}
-
-
-</script>
-
-<script src="https://maps.googleapis.com/maps/api/js?key=<%= apiKey %>&callback=myMap"></script>
+            <script src="https://maps.googleapis.com/maps/api/js?key=<%= apiKey %>&callback=myMap"></script>
 
 </body>
+
 </html>
