@@ -303,7 +303,7 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
     const wifiStatus = req.body.wifiCheck ? "Wi-fi available" : "No wi-fi";
     const outletStatus = req.body.outletCheck ? "Outlet available" : "No outlet";
     const campusStatus = req.body.campusCheck ? "On-campus" : "Off-campus";
-    const foodStatus = req.body.foodCheck ? "Food available" : "No food available" ;
+    const foodStatus = req.body.foodCheck ? "Food available" : "No Food" ;
     const noiseStatus = req.body.noiseCheck === "average" ? "Average noisiness" : 
     req.body.noiseCheck === "quiet" ? "Usually quiet" : "Usually loud";
     const coords = await geocodeAddress(address)
@@ -436,6 +436,9 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
     const wifiStatus = req.body.wifiCheck ? "Wi-fi available" : "No wi-fi";
     const outletStatus = req.body.outletCheck ? "Outlet available" : "No outlet";
     const foodStatus = req.body.foodCheck ? "Food available" : "No Food";
+    const wifiStatus = req.body.wifiCheck ? "Wi-fi available" : "No wi-fi" 
+    const outletStatus = req.body.outletCheck ? "Outlet available" : "No outlet" 
+    const foodStatus = req.body.foodCheck ? "Food available" : "No Food" 
     let noise = req.body.noise;
 
      // Search database for chosen nook to calculate reviewID
