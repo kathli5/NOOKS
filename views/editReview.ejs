@@ -71,18 +71,24 @@
 
             <br>
             <p>Noise Level</p>
-            <% if (review.tags.includes('quiet')) {%>
-            <input type="radio" id="quiet" name="noise" value="quiet" required checked>
+            <% if (review.tags.includes('Average noisiness')) {%>
+            <input type="radio" id="average" name="noise" value="Average noisiness" required checked>
             <% } else { %>
-            <input type="radio" id="quiet" name="noise" value="quiet" required>
+            <input type="radio" id="average" name="noise" value="Average noisiness">
+            <% } %>
+             <label for="loud">Average noisiness</label><br>
+            <% if (review.tags.includes('Usually quiet')) {%>
+            <input type="radio" id="quiet" name="noise" value="Usually quiet" required checked>
+            <% } else { %>
+            <input type="radio" id="quiet" name="noise" value="Usually quiet" required>
             <% } %>
             <label for="quiet">Usually Quiet</label><br>
-            <% if (review.tags.includes('loud')) {%>
-            <input type="radio" id="loud" name="noise" value="loud" required checked>
+            <% if (review.tags.includes('Usually loud')) {%>
+            <input type="radio" id="loud" name="noise" value="Usually loud" required checked>
             <% } else { %>
-            <input type="radio" id="loud" name="noise" value="loud">
+            <input type="radio" id="loud" name="noise" value="Usually loud">
             <% } %>
-            <label for="loud">Potentially Loud</label><br>
+            <label for="loud">Usually Loud</label><br>
 
             <br>
             <fieldset>

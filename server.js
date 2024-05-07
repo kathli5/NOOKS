@@ -305,7 +305,7 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
     const campusStatus = req.body.campusCheck ? "On-campus" : "Off-campus";
     const foodStatus = req.body.foodCheck ? "Food available" : "No food available" ;
     const noiseStatus = req.body.noiseCheck === "average" ? "Average noisiness" : 
-    req.body.noiseCheck === "quiet" ? "Usually quiet" : "Potentially loud";
+    req.body.noiseCheck === "quiet" ? "Usually quiet" : "Usually loud";
     const coords = await geocodeAddress(address)
     console.log('coords are', coords)
     const date = new Date();
@@ -433,12 +433,9 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
 
     //retrieves form data
     let rating = parseInt(req.body.nookRating);
-    const wifi = req.body.wifiCheck;
-    const wifiStatus = () => { return wifi ? "Wi-fi available" : "No wi-fi" }
-    const outlet = req.body.outletCheck;
-    const outletStatus = () => { return outlet ? "Outlet available" : "No outlet" }
-    const food = req.body.foodCheck;
-    const foodStatus = () => { return food ? "Food available" : "No Food" }
+    const wifiStatus = req.body.wifiCheck ? "Wi-fi available" : "No wi-fi";
+    const outletStatus = req.body.outletCheck ? "Outlet available" : "No outlet";
+    const foodStatus = req.body.foodCheck ? "Food available" : "No Food";
     let noise = req.body.noise;
 
      // Search database for chosen nook to calculate reviewID
@@ -465,7 +462,7 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
         rid: id,
         username: req.session.username,
         rating: rating,
-        tags: [wifiStatus(), outletStatus(), foodStatus(), noise],
+        tags: [wifiStatus, outletStatus, foodStatus, noise],
         text: req.body.text
     };
 
@@ -491,7 +488,7 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
     let update = await nooks
         .updateOne(
             { nid: { $eq: nookID } },
-            { $set: { tags: [wifiStatus(), outletStatus(), foodStatus(), noise, campusStatus] } },
+            { $set: { tags: [wifiStatus, outletStatus, foodStatus, noise, campusStatus] } },
         );
 
     //update average rating in nook
