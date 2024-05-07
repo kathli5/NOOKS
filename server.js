@@ -16,6 +16,7 @@ const cookieSession = require('cookie-session');
 const flash = require('express-flash');
 const multer = require('multer');
 const bcrypt = require('bcrypt');
+const counter = require('./counter-utils.js')
 const coordGeocoder = require('node-geocoder');
 require('dotenv').config();
 const apiKey = 'AIzaSyD_i0v65GU6owvHnlwZm3Ip5E-GgWMozOg';
@@ -96,6 +97,7 @@ const DB = process.env.USER;
 const DBNAME = "nooks_db";
 const NOOKS = "nooks";
 const USERS = "users";
+const COUNTERS ="counters"
 
 /**
  * Main page. Prompts user to login or create a login
@@ -302,24 +304,12 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
     const address = req.body.nookAddress;
     const rating = req.body.nookRating;
     const numRating = parseInt(rating);
-    const wifi = req.body.wifiCheck;
-    const wifiStatus = () => { return wifi ? "Wi-fi available" : "No wi-fi" }
-    const outlet = req.body.outletCheck;
-    const outletStatus = () => { return outlet ? "Outlet available" : "No outlet" }
-    const campus = req.body.campusCheck;
-    const campusStatus = () => { return campus ? "On-campus" : "Off-campus" }
-    const food = req.body.foodCheck;
-    const foodStatus = () => { return food ? "Food available" : "No food available" }
-    const noise = req.body.noiseCheck;
-    const noiseStatus = () => {
-        if (noise === "average") {
-            return "Average noisiness";
-        } else if (noise === "quiet") {
-            return "Usually quiet";
-        } else {
-            return "Usually noisy"
-        }
-    }
+    const wifiStatus = req.body.wifiCheck ? "Wi-fi available" : "No wi-fi";
+    const outletStatus = req.body.outletCheck ? "Outlet available" : "No outlet";
+    const campusStatus = req.body.campusCheck ? "On-campus" : "Off-campus";
+    const foodStatus = req.body.foodCheck ? "Food available" : "No food available" ;
+    const noiseStatus = req.body.noiseCheck === "average" ? "Average noisiness" : 
+    req.body.noiseCheck === "quiet" ? "Usually quiet" : "Potentially loud";
     const coords = await geocodeAddress(address)
     console.log('coords are', coords)
     const date = new Date();
@@ -327,10 +317,10 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
     // Database definitions
     const db = await Connection.open(mongoUri, DBNAME);
     const nooks = db.collection(NOOKS);
+    const counters = db.collection(COUNTERS)
 
-    let latest = await nooks.find().sort({ "nid": -1 }).toArray();
-    const id = latest[0].nid + 1;
-
+    //let latest = await nooks.find().sort({ "nid": -1 }).toArray();
+    const id = await counter.incr(counters, 'nooks');
     console.log(numRating);
 
     //geocoding address
@@ -348,7 +338,7 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
             poster: poster,
             rating: numRating,
             latLng: coords,
-            tags: [wifiStatus(), outletStatus(), foodStatus(), noiseStatus(), campusStatus()],
+            tags: [wifiStatus, outletStatus, foodStatus, noiseStatus, campusStatus],
             reviews: [],
             photos: [],
             likes: 0
@@ -439,6 +429,10 @@ app.get('/review/:nookID', async (req, res) => {
  * Average rating of review is updated.
  */
 app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
+    if (!req.session.username) {
+        req.flash('error', 'You are not logged in - please do so.');
+        return res.redirect("/");
+    }
     let nookID = req.params.nookID;
     nookID = Number(nookID);
 
@@ -450,12 +444,9 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
 
     //retrieves form data
     let rating = parseInt(req.body.nookRating);
-    const wifi = req.body.wifiCheck;
-    const wifiStatus = () => { return wifi ? "Wi-fi available" : "No wi-fi" }
-    const outlet = req.body.outletCheck;
-    const outletStatus = () => { return outlet ? "Outlet available" : "No outlet" }
-    const food = req.body.foodCheck;
-    const foodStatus = () => { return food ? "Food available" : "No Food" }
+    const wifiStatus = req.body.wifiCheck ? "Wi-fi available" : "No wi-fi" ;
+    const outletStatus = req.body.outletCheck ? "Outlet available" : "No outlet"; 
+    const foodStatus = req.body.foodCheck ? "Food available" : "No Food";
     let noise = req.body.noise;
 
     //add reviewID with earliest review being rid= 1
