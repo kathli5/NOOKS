@@ -93,7 +93,6 @@ const geocoder = coordGeocoder(options);
 // ================================================================
 // custom routes here
 
-const DB = process.env.USER;
 const DBNAME = "nooks_db";
 const NOOKS = "nooks";
 const USERS = "users";
@@ -213,11 +212,10 @@ app.get('/results/', async (req, res) => {
     let location = req.query.location;
     let noise = req.query.noise;
     let outlets = req.query.outlets;
-    let searchTags = [wifi, food, location, noise, outlets].filter(tag => tag != null && tag !== '' && tag != 'undefined');
+    let searchTags = [wifi, food, location, noise, outlets].filter
+    (tag => tag != null && tag !== '' && tag != 'undefined');
     console.log("Searched tags: ", searchTags);
     console.log("Searched name: ", nookName);
-
-
 
     //connecting to MongoDB
     console.log('Connecting to MongoDB:', mongoUri);
@@ -226,7 +224,6 @@ app.get('/results/', async (req, res) => {
     console.log('Connected to MongoDB');
     //searching the database based on form inputs
     let searchResults = [];
-
 
     //only searching by tags
     if (!nookName && searchTags.length == 0) {
@@ -242,7 +239,8 @@ app.get('/results/', async (req, res) => {
 
         //searching by both name and tag
     } else {
-        searchResults = await nooks.find({ name: { $regex: nookName, $options: 'i' }, tags: { $all: searchTags } }).toArray();
+        searchResults = await nooks.find({ name: { $regex: nookName, $options: 'i' }, 
+        tags: { $all: searchTags } }).toArray();
     }
 
     //message if the query doesn't match any nooks in the database
@@ -269,7 +267,6 @@ app.get('/add-nook/', async (req, res) => {
     return res.render('nookForm.ejs', { apiKey });
 })
 
-
 //for adding coords to object
 async function geocodeAddress(address) {
     console.log(address)
@@ -292,7 +289,6 @@ async function geocodeAddress(address) {
         throw error;
     }
 }
-
 
 /**
  * Adding a new nook to database
@@ -324,7 +320,6 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
     console.log(numRating);
 
     //geocoding address
-
 
     if (address === "" || isNaN(numRating)) { //check that address and numRating are filled
         req.flash('error', 'Please fill out every field.');
@@ -436,18 +431,21 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
     let nookID = req.params.nookID;
     nookID = Number(nookID);
 
-    // Search database for chosen movie and bring it out of array
-    const db = await Connection.open(mongoUri, DBNAME);
-    const nooks = db.collection(NOOKS);
-    let chosen = await nooks.find({ nid: { $eq: nookID } }).toArray();
-    let nook = chosen[0];
-
     //retrieves form data
     let rating = parseInt(req.body.nookRating);
-    const wifiStatus = req.body.wifiCheck ? "Wi-fi available" : "No wi-fi" ;
-    const outletStatus = req.body.outletCheck ? "Outlet available" : "No outlet"; 
-    const foodStatus = req.body.foodCheck ? "Food available" : "No Food";
+    const wifi = req.body.wifiCheck;
+    const wifiStatus = () => { return wifi ? "Wi-fi available" : "No wi-fi" }
+    const outlet = req.body.outletCheck;
+    const outletStatus = () => { return outlet ? "Outlet available" : "No outlet" }
+    const food = req.body.foodCheck;
+    const foodStatus = () => { return food ? "Food available" : "No Food" }
     let noise = req.body.noise;
+
+     // Search database for chosen nook to calculate reviewID
+     const db = await Connection.open(mongoUri, DBNAME);
+     const nooks = db.collection(NOOKS);
+     let chosen = await nooks.find({ nid: { $eq: nookID } }).toArray();
+     let nook = chosen[0]; 
 
     //add reviewID with earliest review being rid= 1
     let reviews = nook.reviews;
