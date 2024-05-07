@@ -335,6 +335,7 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
             latLng: coords,
             tags: [wifiStatus, outletStatus, foodStatus, noiseStatus, campusStatus],
             reviews: [],
+            rid: 0,
             photos: [],
             likes: 0
         });
@@ -443,23 +444,11 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
      const nooks = db.collection(NOOKS);
      let chosen = await nooks.find({ nid: { $eq: nookID } }).toArray();
      let nook = chosen[0]; 
-
-    //add reviewID with earliest review being rid= 1
-    let reviews = nook.reviews;
-    let id = 1
-    if (reviews.length == 0) {
-        id = 1
-    }
-    else {
-        let sorted = reviews.sort(function (first, second) {
-            return second.rid - first.rid;
-        })
-        id = sorted[0].rid + 1;
-    }
+     let rid = nook.rid;
 
     //review document
     let review = {
-        rid: id,
+        rid: rid + 1,
         username: req.session.username,
         rating: rating,
         tags: [rwifiStatus, routletStatus, rfoodStatus, noise],
@@ -480,7 +469,8 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
     let result = await nooks
         .updateOne(
             { nid: { $eq: nookID } },
-            { $push: { reviews: review } }
+            {   $inc: {rid: 1},
+                $push: { reviews: review } }
         );
 
     //update info in nook to reflect tags in most recent review
@@ -491,8 +481,9 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
             { $set: { tags: [rwifiStatus, routletStatus, rfoodStatus, noise, campusStatus] } },
         );
 
-    //update average rating in nook
+    //update average rating in nook, after adding in new review
     let totalRating = 0;
+    let reviews = nook.reviews;
     reviews.forEach((elem) => {
         totalRating += elem.rating;
     })
