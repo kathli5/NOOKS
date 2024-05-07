@@ -23,7 +23,7 @@
                             <% if (elt.photos.length===0) { %>
                                 <img class="card-img-top" src="https://ralfvanveen.com/wp-content/uploads/2021/06/Placeholder-_-Glossary.svg" alt="No image available">
                                 <%} else {%>
-                                    <img class="card-img-top" src="<%=elt.photos%>" alt="<%=elt.name%>">
+                                    <img class="card-img-top" src="<%=elt.photos[0]%>" alt="<%=elt.name%>">
                                     <% } %>
                                         <div class="card-body">
                                             <h5 class="card-text">
