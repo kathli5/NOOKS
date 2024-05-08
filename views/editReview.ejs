@@ -68,6 +68,16 @@
                     Food Available?
                 </label>
             </div>
+            <div class="form-check form-switch">
+                <% if (review.tags.includes('On-campus')) {%>
+                <input class="form-check-input" type="checkbox" role="switch" value="campus" id="campus-check" name="campusCheck" checked>
+                <% } else { %>
+                    <input class="form-check-input" type="checkbox" role="switch" value="campus" id="campus-check" name="campusCheck">
+                <% } %>
+                <label class="form-check-label" for="campus-check">
+                    On-campus?
+                </label>
+            </div>
 
             <br>
             <p>Noise Level</p>

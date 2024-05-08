@@ -444,6 +444,8 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
     const rwifiStatus = req.body.wifiCheck ? "Wi-fi available" : "No wi-fi";
     const routletStatus = req.body.outletCheck ? "Outlet available" : "No outlet";
     const rfoodStatus = req.body.foodCheck ? "Food available" : "No Food";
+    const rcampusStatus = req.body.campusCheck ? "On-campus" : "Off-campus";
+
     let noise = req.body.noise;
 
     //database definitions
@@ -461,7 +463,7 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
         rid: rid,
         username: req.session.username,
         rating: rating,
-        tags: [rwifiStatus, routletStatus, rfoodStatus, noise],
+        tags: [rwifiStatus, routletStatus, rfoodStatus, rcampusStatus, noise],
         text: req.body.text
     };
 

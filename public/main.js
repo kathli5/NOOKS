@@ -38,23 +38,27 @@ $("#login-ajax").click(loginAjax);
 
 console.log('main.js loaded');
 
+
+
 /**
  * On click, derives the nook from the like button class,
  * calls likeNook(nid) to use ajax to like Nook
  */
 $(document).ready(() => {
-    const carousel = new bootstrap.Carousel('.carouselExampleIndicators')
-    $(".carousel-item").first().addClass("active");
-
+    // click handler for like button
     $('.likebutton').click((e) => {
         let nid = $(e.currentTarget).attr("class").split(/\s+/)[1];
         console.log(nid);
         likeNook(nid);
-    })
+    });
+
+    // enables bootstrap carousel
+    const carousel = new bootstrap.Carousel('.nookPhotoCarousel')
+    $(".carousel-item").first().addClass("active");
 
     /**
-     * Takes a nook id and uses ajax to retrieve information on whether the user has or hasn't liked the nook.
-     * Then updates the nook list page accordingly. 
+     * Takes a nook id and uses ajax to retrieve information on whether the user 
+     * has or hasn't liked the nook. Then updates the nook list page accordingly. 
      * @param nid ID of the nook being updated
      */
     function likeNook(nid) {
@@ -74,4 +78,5 @@ $(document).ready(() => {
                 $(`.${nid}`).prev().text(res.likes)
             }
         });
-    }})
+    }
+})

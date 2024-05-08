@@ -42,10 +42,6 @@ option {
   background: transparent;
 }
 
-.list-group {
-  width: 12%;
-}
-
 .review {
   list-style-type: none;
   display: grid;
@@ -84,5 +80,9 @@ option {
 }
 
 .carousel {
+  max-width:50em;
+}
+
+.reviewlist {
   max-width:50em;
 }
