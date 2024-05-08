@@ -439,16 +439,21 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
     const rfoodStatus = req.body.foodCheck ? "Food available" : "No Food";
     let noise = req.body.noise;
 
-     // Search database for chosen nook to calculate reviewID
-     const db = await Connection.open(mongoUri, DBNAME);
-     const nooks = db.collection(NOOKS);
-     let chosen = await nooks.find({ nid: { $eq: nookID } }).toArray();
-     let nook = chosen[0]; 
-     let rid = nook.rid;
+    //database definitions
+    const db = await Connection.open(mongoUri, DBNAME);
+    const nooks = db.collection(NOOKS);
+    // let chosen = await nooks.find({ nid: { $eq: nookID } }).toArray();
+    // let nook = chosen[0]; 
+
+    //calculate review id
+    let nook = await nooks.findOneAndUpdate({nid: nookID},
+                                            {$inc: {rid:1}},
+                                            {returnDocument: 'after'});
+    let rid = nook.rid;
 
     //review document
     let review = {
-        rid: rid + 1,
+        rid: rid,
         username: req.session.username,
         rating: rating,
         tags: [rwifiStatus, routletStatus, rfoodStatus, noise],
@@ -469,8 +474,7 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
     let result = await nooks
         .updateOne(
             { nid: { $eq: nookID } },
-            {   $inc: {rid: 1},
-                $push: { reviews: review } }
+            {$push: { reviews: review } }
         );
 
     //update info in nook to reflect tags in most recent review
