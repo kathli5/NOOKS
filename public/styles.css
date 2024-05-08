@@ -55,7 +55,15 @@ option {
   width: 50%;
 }
 
-li:not(:last-child){
+/* li:not(:last-child){
   border-bottom: 1px solid orangered;
-}
+} */
 
+.box {
+  width: 800px;
+  height: 100px;
+  border: 1px solid black;
+  padding: 10px;
+  margin: 0px;
+  list-style-type: none;
+}

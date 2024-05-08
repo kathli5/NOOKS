@@ -32,14 +32,15 @@
           <% }) %>
       </ul><br>
       <h2>Reviews</h2>
-      <div>
-      <ul class="review">
+      
+      <ul>
         <% reviews.forEach(elt=> { %>
+          <div class="box">
           <li>
             <%=elt.text%>
-          </li>
+          </li></div>
           <% }) %>
-      </ul></div><br>
+      </ul><br>
       <h2>Photos</h2>
       
       <% if (photos.length > 0) { %>
