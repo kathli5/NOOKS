@@ -32,11 +32,6 @@ option {
   z-index: -1;
 }
 
-#delete {
-  background-color: lightpink;
-  color:black;
-}
-
 .likebutton {
   border:none;
   background: transparent;
