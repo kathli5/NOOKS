@@ -234,7 +234,7 @@ app.get('/results/', async (req, res) => {
     //message if the query doesn't match any nooks in the database
     if (searchResults.length == 0) {
         req.flash("error", "Your query doesn't match any of our current nooks")
-        return res.render("search.ejs");
+        return res.redirect("/all");
     }
 
     let liked = await db.collection(USERS).find({username:req.session.username}).toArray();
