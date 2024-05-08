@@ -442,8 +442,6 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
     //database definitions
     const db = await Connection.open(mongoUri, DBNAME);
     const nooks = db.collection(NOOKS);
-    // let chosen = await nooks.find({ nid: { $eq: nookID } }).toArray();
-    // let nook = chosen[0]; 
 
     //calculate review id
     let nook = await nooks.findOneAndUpdate({nid: nookID},

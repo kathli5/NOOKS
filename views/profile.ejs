@@ -18,6 +18,7 @@
             <% nook.reviews.forEach(review => {%>
                 <% if (review.username == username ) { %>
                     <li>
+                        <a href="<%='../nook/' + nook.nid%>"><h3><%=nook.name%></h3></a>
                         <%=review.text%>
                         <form method="GET" action="/edit/<%= nook.nid%>/<%= review.rid%>">
                             <input type="submit" value="Edit review">
