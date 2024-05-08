@@ -77,3 +77,12 @@ option {
 #loginPage {
   max-width:50em;
 }
+
+.carouselPhotos {
+  height:30em;
+  object-fit:cover;
+}
+
+.carousel {
+  max-width:50em;
+}

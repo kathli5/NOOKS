@@ -6,6 +6,7 @@
   <title>
     <%=address%>
   </title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <%- include("partials/imports.ejs") %>
 </head>
 
@@ -16,42 +17,91 @@
       <h1>
         <%= nook.name %>
       </h1>
-      <p>Posted by <%= poster %>
+      <p class="lead">
+        <%= nook.address %>
       </p>
-      <h2>Rating </h2>
-      <span>
-        <%= rating %>
-        <span>&#9733;</span>
-      </span><br><br>
-      <h2>Tags</h2>
-      <ul class="list-group">
+      <p>
+        Rated <%= rating %>/5
+          <% if (rating===0) { %>
+            <i class="bi bi-star"></i>
+            <i class="bi bi-star"></i>
+            <i class="bi bi-star"></i>
+            <i class="bi bi-star"></i>
+            <i class="bi bi-star"></i>
+            <% } else if (rating===1) { %>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star"></i>
+              <i class="bi bi-star"></i>
+              <i class="bi bi-star"></i>
+              <i class="bi bi-star"></i>
+              <% } else if (rating===2) { %>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star"></i>
+                <i class="bi bi-star"></i>
+                <i class="bi bi-star"></i>
+                <% } else if (rating===3) { %>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star"></i>
+                  <i class="bi bi-star"></i>
+                  <% } else if (rating===4) { %>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star"></i>
+                    <% } else if (rating===5) { %>
+                      <i class="bi bi-star-fill"></i>
+                      <i class="bi bi-star-fill"></i>
+                      <i class="bi bi-star-fill"></i>
+                      <i class="bi bi-star-fill"></i>
+                      <i class="bi bi-star-fill"></i>
+                      <% } %>
+                    </p>
+
+
+      <p class="nooktags">
         <% tags.forEach(elt=> { %>
-          <li class="list-group-item">
-            <%=elt%>
-          </li>
-          <% }) %>
-      </ul><br>
+          <small class="d-inline-flex mb-3 px-2 py-1 fw-semibold text-secondary-emphasis bg-secondary-subtle border border-secondary-subtle rounded-2"><%=elt%></small>
+          <% }) %></p>
+
+      <div class="carousel slide carouselExampleIndicators">
+        <div class="carousel-inner">
+          <% if (photos.length> 0) { %>
+            <% photos.forEach(elt=> { %>
+              <div class="carousel-item">
+                <img src="<%= elt %>" class="d-block w-100 carouselPhotos" alt="Photo of <%= address %>">
+              </div>
+              <% }) %>
+                <% } %>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target=".carouselExampleIndicators"
+          data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target=".carouselExampleIndicators"
+          data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+
+
+
       <h2>Reviews</h2>
-      
+
       <ul>
         <% reviews.forEach(elt=> { %>
           <div class="box">
-          <li>
-            <%=elt.text%>
-          </li></div>
+            <li>
+              <%=elt.text%>
+            </li>
+          </div>
           <% }) %>
       </ul><br>
-      <h2>Photos</h2>
-      
-      <% if (photos.length > 0) { %>
-        <ul>
-          <% photos.forEach(elt=> { %>
-            <li>
-              <img class="nook_photos" src="<%= elt %>" alt="Photo of <%= address %>"/>
-            </li>
-            <% }) %>
-        </ul>
-      <% } %>
 
       <form method="GET" action="/get-review">
         <br>
