@@ -29,7 +29,7 @@
                 function myMap() {
                     var mapProps = {
                         center: new google.maps.LatLng(42.295567, -71.309726),
-                        zoom: 12,
+                        zoom: 8,
                     };
                     var infoWindow = new google.maps.InfoWindow();
                     //initialize map
@@ -52,10 +52,11 @@
                             });
                             markers.push(marker);
                         }
-                    });
 
+                    });
                 }
             </script>
+            
 
             <script src="https://maps.googleapis.com/maps/api/js?key=<%= apiKey %>&callback=myMap"></script>
 
