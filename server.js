@@ -561,6 +561,7 @@ app.post('/edit/:nid/:rid', async (req, res) => {
     const updaterwifiStatus = req.body.wifiCheck ? "Wi-fi available" : "No wi-fi";
     const updateroutletStatus = req.body.outletCheck ? "Outlet available" : "No outlet";
     const updaterfoodStatus = req.body.foodCheck ? "Food available" : "No Food";
+    const updatercampusStatus = req.body.campusCheck ? "On-campus" : "Off-campus";
     let noise = req.body.noise;
 
     //update review in database 
@@ -570,7 +571,7 @@ app.post('/edit/:nid/:rid', async (req, res) => {
             {
                 $set: {
                     'reviews.$.rating': rating,
-                    'reviews.$.tags': [updaterwifiStatus, updateroutletStatus, updaterfoodStatus, noise],
+                    'reviews.$.tags': [updaterwifiStatus, updateroutletStatus, updaterfoodStatus, updatercampusStatus, noise],
                     'reviews.$.text': req.body.text
                 }
             }
@@ -582,7 +583,7 @@ app.post('/edit/:nid/:rid', async (req, res) => {
     let updateInfo = await nooks
         .updateOne(
             { nid: { $eq: nid } },
-            { $set: { tags: [updaterwifiStatus,updateroutletStatus, updaterfoodStatus, noise, campusStatus] } },
+            { $set: { tags: [updaterwifiStatus,updateroutletStatus, updaterfoodStatus, noise, updatercampusStatus] } },
         );
 
     //update average rating in nook
