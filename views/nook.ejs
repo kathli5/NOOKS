@@ -18,27 +18,29 @@
       </h1>
       <p>Posted by <%= poster %>
       </p>
-      <h2>Rating:</h2>
+      <h2>Rating </h2>
       <span>
         <%= rating %>
-      </span>
-      <h2>Tags:</h2>
-      <ul>
+        <span>&#9733;</span>
+      </span><br><br>
+      <h2>Tags</h2>
+      <ul class="list-group">
         <% tags.forEach(elt=> { %>
-          <li>
+          <li class="list-group-item">
             <%=elt%>
           </li>
           <% }) %>
-      </ul>
-      <h2>Reviews:</h2>
-      <ul>
+      </ul><br>
+      <h2>Reviews</h2>
+      <div>
+      <ul class="review">
         <% reviews.forEach(elt=> { %>
           <li>
             <%=elt.text%>
           </li>
           <% }) %>
-      </ul>
-      <h2>Photos:</h2>
+      </ul></div><br>
+      <h2>Photos</h2>
       
       <% if (photos.length > 0) { %>
         <ul>

@@ -41,3 +41,21 @@ option {
   border:none;
   background: transparent;
 }
+
+.list-group {
+  width: 12%;
+}
+
+.review {
+  list-style-type: none;
+  display: grid;
+  margin-top:20;
+  padding-left: 0;
+  border: 1px solid orangered;
+  width: 50%;
+}
+
+li:not(:last-child){
+  border-bottom: 1px solid orangered;
+}
+
