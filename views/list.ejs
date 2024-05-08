@@ -10,9 +10,20 @@
 <body>
     <%- include("partials/navbar.ejs") %>
         <section class="pagebody container">
-            <h1><%= listDescription %>
-            <br><br>
-            </h1>
+            <h1 class="mb-4"><%= listDescription %></h1>
+            <div class="accordion mb-4" id="accordionExample">
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed text-bg-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                      Search Nooks
+                    </button>
+                  </h2>
+                  <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                        <%- include("partials/search.ejs") %>                    </div>
+                  </div>
+                </div>
+                </div>
             <div class="row ">
                 <% list.forEach( (elt)=> {%>
                     <div class="col mb-5">
@@ -26,6 +37,8 @@
                                         <div class="card-body">
                                             <h5 class="card-text">
                                                 <a href="<%='/nook/'+elt.nid %>""><%= elt.name %></a></h5>
+                                                <p class="card-text">
+                                                    <%= elt.address %></p>
                                 </div>
                             
                             <div class=" card-footer text-end">

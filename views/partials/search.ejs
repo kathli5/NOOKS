@@ -1,0 +1,50 @@
+<form class="example" id="search_form" method="GET" action="/results/">
+    <fieldset>
+        <legend>Search By Nook</legend>
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" name="name" id="name" placeholder="Search...">
+            <label for="name">Search</label>
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>Search By Tag</legend>
+
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="Wi-fi available" id="wifi" name="wifi">
+            <label class="form-check-label" for="wifi">
+                Free wi-fi
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="food" name="food" value="Food available">
+            <label class="form-check-label" for="food">
+                Food available
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="outlets" name="outlets" value="Outlet available">
+            <label class="form-check-label" for="outlets">
+                Outlets available
+            </label>
+        </div>
+
+        <div class="mt-3">
+            <label for="location">Location</label>
+            <select class="form-select" id="location" name="location">
+                <option value="">Select location</option>
+                <option value="On-campus">On Campus</option>
+                <option value="Off-campus">Off Campus</option>
+              </select>
+        </div>
+        <div class="mt-3">
+            <label for="noiseLevel">Noise Level</label>
+            <select class="form-select" id="noiseLevel" name="noise">
+                <option value="">Select noise level</option>
+                <option value="Average noisiness">Average noisiness</option>
+                <option value="Usually quiet">Usually Quiet</option>
+                <option value="Usually loud">Potentially Loud</option>
+            </select>
+        </div>
+    </fieldset>
+    <button class="btn btn-primary mt-3" type="submit">Search</button>
+</form>
