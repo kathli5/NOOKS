@@ -249,11 +249,18 @@ app.get('/results/', async (req, res) => {
         return res.render("search.ejs");
     }
 
-    console.log("RESULTS: ", searchResults.length);
+    let liked = await db.collection(USERS).find({username:req.session.username}).toArray();
+
+    if (!("likes" in liked[0])) {
+        let addlikes = await db.collection(USERS).updateOne({username: req.session.username}, {$set: {"likes": {}}});
+        liked = await db.collection(USERS).find({username:req.session.username}).toArray();
+    }
+    liked = liked[0].likes;
+
     await Connection.close();
 
     //renders results
-    return res.render('results.ejs', { results: searchResults });
+    return res.render('list.ejs', { list: searchResults, listDescription:"Search Results", likes:liked });
 });
 
 /**

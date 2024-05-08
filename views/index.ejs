@@ -1,42 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8" />
-    <title>Nooks</title>
-    <%- include("partials/imports.ejs") %>
+  <meta charset="UTF-8" />
+  <title>Nooks</title>
+  <%- include("partials/imports.ejs") %>
 </head>
+
 <body>
 
-  <section class="pagebody">
+  <section id="loginPage" class="pagebody container">
 
-    <h1>Welcome to NOOKS!</h1>
+    <div class="text-center p-3"><h1>Welcome to NOOKS!</h1></div>
 
     <%- include("partials/flashes.ejs") %>
 
-<h2>Register:</h2>
-  <p>
-    <form action="/join" method="POST">
-        <label> Username
-            <input type="text" name="username" placeholder="og102">
-        </label>
-        <label> Password
-            <input type="text" name="password" placeholder="********">
-        </label>
-      <button type="submit">register</button>
-    </form>
-  </p>
-  <h2>Login:</h2>
-  <p>
-    <form action="/login" method="POST">
-        <label> Username
-            <input type="text" name="username" placeholder="og102">
-        </label>
-        <label> Password
-            <input type="password" name="password" placeholder="********">
-        </label>
-      <button type="submit">login</button>
-    </form>
-  </p>
-</section>
+      <div class="accordion" id="accordionExample">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingOne">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
+              aria-expanded="true" aria-controls="collapseOne">
+              Log In
+            </button>
+          </h2>
+          <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+            data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+              <form action="/login" method="POST">
+                <div class="mb-3">
+                  <label for="usernamelogin" class="form-label">Username</label>
+                  <input type="text" class="form-control" id="usernamelogin" name="username" placeholder="Username">
+                </div>
+                <div class="mb-3">
+                  <label for="passwordlogin" class="form-label">Password</label>
+                  <input type="password" class="form-control" id="passwordlogin" name="password" placeholder="********">
+                </div>
+                <button class="btn btn-primary mb-3" type="submit">Log In</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingTwo">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+              data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+              No account yet? Register here.
+            </button>
+          </h2>
+          <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+            data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+              <form action="/join" method="POST">
+                <div class="mb-3">
+                  <label for="usernamejoin" class="form-label">Username</label>
+                  <input type="text" class="form-control" id="usernamejoin" name="username" placeholder="Username">
+                </div>
+                <div class="mb-3">
+                  <label for="passwordjoin" class="form-label">Password</label>
+                  <input type="password" class="form-control" id="passwordjoin" name="password" placeholder="********">
+                </div>
+                <button class="btn btn-primary mb-3" type="submit">Register</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+  </section>
 </body>
+
 </html>

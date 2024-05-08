@@ -67,3 +67,13 @@ option {
   margin: 0px;
   list-style-type: none;
 }
+
+.nookThumb {
+  height:12em;
+  overflow:hidden;
+  object-fit:cover;
+}
+
+#loginPage {
+  max-width:50em;
+}

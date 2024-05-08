@@ -10,20 +10,18 @@
 <body>
     <%- include("partials/navbar.ejs") %>
         <section class="pagebody container">
-            <h1>List of <%= listDescription %>
+            <h1><%= listDescription %>
             <br><br>
             </h1>
             <div class="row ">
                 <% list.forEach( (elt)=> {%>
-
-
                     <div class="col mb-5">
                         <div class="card" style="width:20em;">
                             <!--if there is no photo upload a preset blank-->
                             <% if (elt.photos.length===0) { %>
-                                <img class="card-img-top" src="https://ralfvanveen.com/wp-content/uploads/2021/06/Placeholder-_-Glossary.svg" alt="No image available">
+                                <img class="card-img-top nookThumb" src="https://ralfvanveen.com/wp-content/uploads/2021/06/Placeholder-_-Glossary.svg" alt="No image available">
                                 <%} else {%>
-                                    <img class="card-img-top" src="<%=elt.photos[0]%>" alt="<%=elt.name%>">
+                                    <img class="card-img-top nookThumb" src="<%=elt.photos[0]%>" alt="<%=elt.name%>">
                                     <% } %>
                                         <div class="card-body">
                                             <h5 class="card-text">
