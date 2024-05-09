@@ -92,21 +92,48 @@
       <h2 class="mt-5 mb-3">Reviews</h2>
 
       <form method="GET" action="/get-review" class="float-right">
-        <button type="submit" class="btn btn-success" name="nid" id="nid" value="<%= nook.nid %>">Add Review</button>
-      </form>
+        <button type="submit" class="btn btn-primary btn-lg btn-block" name="nid" id="nid" value="<%= nook.nid %>">Add Review</button>
+      </form><br>
 
-      <ul class="list-group mt-3 reviewlist">
-        <% reviews.forEach(elt=> { %>
-          <li class="list-group-item d-flex justify-content-between align-items-start">
-            <div class="ms-2 me-auto">
-              <div class="fw-bold"><%=elt.username%></div>
-              <%=elt.text%>
-            </div>
-            <span class="badge text-bg-primary rounded-pill"><%=elt.rating%>/5</span>
-          </li>
-          <% }) %>
-      </ul><br>
-    </section>
+    
+
+     <ul class="list-group list-group-flush border-top">
+              <!-- List Group Item -->
+              <% reviews.forEach(elt=> { %>
+              
+              <li class="list-group-item px-0 py-4">
+                  <div class="d-flex">
+    
+                      <div class="ms-3 mt-2">
+                          <div
+                              class="d-flex align-items-center justify-content-between">
+                              <div>
+                                  <h4 class="mb-0"><%=elt.username%></h4>
+                                  
+                              </div>
+                          </div>
+                          <div class="mt-2">
+                              <span class="me-1">
+                                  <i
+                                      class="mdi mdi-star me-n1 mb-2 text-warning fs-6"></i>
+                                  <i
+                                      class="mdi mdi-star me-n1 mb-2 text-warning fs-6"></i>
+                                  <i
+                                      class="mdi mdi-star me-n1 mb-2 text-warning fs-6"></i>
+                                  <i
+                                      class="mdi mdi-star me-n1 mb-2 text-warning fs-6"></i>
+                                  <i
+                                      class="mdi mdi-star mb-2 text-warning fs-6"></i>
+                              </span>
+                              <p class="mt-2">
+                                <%=elt.text%>
+                              </p>
+                              <span class="badge text-bg-primary rounded-pill"><%=elt.rating%>/5</span>
+                          </div>
+                      </div>
+                  </div>
+                  <% }) %>
+                  </section>
 </body>
 
 </html>
