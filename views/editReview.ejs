@@ -35,6 +35,9 @@
 
             <br>
             <fieldset>
+            <div class="row mb-4">
+            <div class="col">
+            <div data-mdb-input-init class="form-outline">
             <legend>Tags</legend>
             <div class="form-check form-switch">
                 <% if (review.tags.includes('Wi-fi available')) {%>
@@ -82,7 +85,10 @@
                     On-campus?
                 </label>
             </div>
-            </fieldset>
+            </div>
+            </div>
+            <div class="col">
+            <div data-mdb-input-init class="form-outline">
 
             <br>
             <fieldset>
@@ -104,8 +110,10 @@
             <% } else { %>
             <input type="radio" id="loud" name="noise" value="Usually loud">
             <% } %>
-            <label for="loud">Usually Loud</label><br>
+            <label for="loud">Usually Loud</label>
             </fieldset>
+            </div>
+            </div>
             <br>
             <fieldset>
                 <label for="text"><legend>Edit Review</legend></label>
