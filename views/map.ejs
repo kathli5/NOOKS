@@ -31,6 +31,7 @@
                     var mapProps = {
                         center: new google.maps.LatLng(42.295567, -71.309726),
                         zoom: 10,
+                        mapId: 'NOOKS'
                     };
                     var infoWindow = new google.maps.InfoWindow();
                     //initialize map
@@ -41,8 +42,8 @@
                     //var nooks = [{latLng:{ latitude: 42.3256208, longitude: -71.25918589999999 }, title: '1'}, {latLng: {latitude: 42.324080, longitude:-71.263210}, title: '2'}]
                     nooks.forEach(nook => {
                         if (nook.latLng && nook.latLng.latitude && nook.latLng.longitude) {
-                            console.log(nook);
-                            var marker = new google.maps.Marker({
+                            console.log(nook.name);
+                            var marker = new google.maps.marker.AdvancedMarkerElement({
                                 position: new google.maps.LatLng(nook.latLng.latitude, nook.latLng.longitude),
                                 map: map,
                                 title: nook.name
@@ -58,7 +59,7 @@
                 }
             </script>
 
-            <script src="https://maps.googleapis.com/maps/api/js?key=<%= apiKey %>&callback=myMap"></script>
+            <script src="https://maps.googleapis.com/maps/api/js?key=<%= apiKey %>&callback=myMap&v=weekly&libraries=marker"></script>
 
 </body>
 
