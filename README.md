@@ -5,7 +5,7 @@ This is the github repository for NOOKS, an app created by Alyssa Lima, Thea Fel
 
 Our code is in the account _nooks_ in the directory _beta_. 
 
-**Beta Version: New Features **
+**Beta Version: New Features**
 - Map View: pinned nook locations on the map, with clickable info windows that bring the user to the nook page.
 - Standardized noise level language, and the way it appears in the search, add nook, and review forms.
 - Creating boxes for reviews, to display more info besides the comment
