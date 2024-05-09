@@ -18,7 +18,9 @@
         <h1>Edit my review for <%= nook.name %></h1>
 
         <form id="review_form" method="POST" action="/edit/<%= nook.nid %>/<%= review.rid %>">
-            <label for="nookRating" class="form-label">Rating</label>
+            <fieldset>
+                <label for="nookRating">
+                <legend>Rating</legend></label>
             <input type="range" name="nookRating" id="nookRating" class="form-range" min="0" max="5" step="1"
                 list="steplist" value='<%=review.rating%>' required />
             <datalist id="steplist">
@@ -29,9 +31,11 @@
                 <option>4</option>
                 <option>5</option>
             </datalist>
+            </fieldset>
 
             <br>
-            <p>Tags</p>
+            <fieldset>
+            <legend>Tags</legend>
             <div class="form-check form-switch">
                 <% if (review.tags.includes('Wi-fi available')) {%>
                 <input class="form-check-input" type="checkbox" role="switch" value="wifi" id="wifi-check"
@@ -78,15 +82,17 @@
                     On-campus?
                 </label>
             </div>
+            </fieldset>
 
             <br>
-            <p>Noise Level</p>
+            <fieldset>
+            <legend>Noise Level</legend>
             <% if (review.tags.includes('Average noisiness')) {%>
             <input type="radio" id="average" name="noise" value="Average noisiness" required checked>
             <% } else { %>
             <input type="radio" id="average" name="noise" value="Average noisiness">
             <% } %>
-             <label for="loud">Average noisiness</label><br>
+             <label for="average">Average noisiness</label><br>
             <% if (review.tags.includes('Usually quiet')) {%>
             <input type="radio" id="quiet" name="noise" value="Usually quiet" required checked>
             <% } else { %>
@@ -99,24 +105,26 @@
             <input type="radio" id="loud" name="noise" value="Usually loud">
             <% } %>
             <label for="loud">Usually Loud</label><br>
-
+            </fieldset>
             <br>
             <fieldset>
-                <label for="text">Edit Review</label>
+                <label for="text"><legend>Edit Review</legend></label>
                 <textarea id="text" name="text" class="form-control"
                     placeholder="Add Review Here" rows="3" cols="40"><%=review.text%></textarea>
             </fieldset>
 
             <br>
-            <p> Photos: </p>
+            <fieldset>
+            <legend>Photos: </legend>
             <% if (review.photo) { %>
                 <img class="nook_photos" src="<%= review.photo %>" alt="Photo of <%= nook.name %>"/>
             <%}%>
+            </fieldset>
             <p><button type="submit" class="btn btn-primary mt-3 form-control">Update Review</button></p>
         </form>
 
         <form method="POST" action="/delete/<%= nook.nid %>/<%= review.rid %>">
-            <p><button id="delete" type="submit" class="btn btn-primary mt-3 form-control">Delete Review</button></p>
+            <p><button id="delete" type="submit" class="btn btn-danger mt-3 form-control">Delete Review</button></p>
         </form>
     </section>
     

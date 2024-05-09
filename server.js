@@ -181,18 +181,6 @@ app.post('/logout', (req, res) => {
 });
 
 /**
- * Search page for existing Nooks
- */
-app.get('/search/', async (req, res) => {
-    // Checks if user is logged in
-    if (!req.session.username) {
-        req.flash('error', 'You are not logged in. Please log in.');
-        return res.redirect("/");
-    }
-    return res.render('search.ejs');
-});
-
-/**
  * Results page for search results
  */
 app.get('/results/', async (req, res) => {
@@ -246,13 +234,14 @@ app.get('/results/', async (req, res) => {
     //message if the query doesn't match any nooks in the database
     if (searchResults.length == 0) {
         req.flash("error", "Your query doesn't match any of our current nooks")
-        return res.render("search.ejs");
+        return res.redirect("/all");
     }
 
     let liked = await db.collection(USERS).find({username:req.session.username}).toArray();
 
     if (!("likes" in liked[0])) {
-        let addlikes = await db.collection(USERS).updateOne({username: req.session.username}, {$set: {"likes": {}}});
+        let addlikes = await db.collection(USERS)
+                        .updateOne({username: req.session.username}, {$set: {"likes": {}}});
         liked = await db.collection(USERS).find({username:req.session.username}).toArray();
     }
     liked = liked[0].likes;
@@ -260,7 +249,8 @@ app.get('/results/', async (req, res) => {
     await Connection.close();
 
     //renders results
-    return res.render('list.ejs', { list: searchResults, listDescription:"Search Results", likes:liked });
+    return res.render('list.ejs', 
+    { list: searchResults, listDescription:"Search Results", likes:liked });
 });
 
 /**
@@ -322,7 +312,7 @@ app.post("/add-nook/", upload.single('nookPhoto'), async (req, res) => {
     const nooks = db.collection(NOOKS);
     const counters = db.collection(COUNTERS)
 
-    //let latest = await nooks.find().sort({ "nid": -1 }).toArray();
+    //Use counter to assign nook ID
     const id = await counter.incr(counters, 'nooks');
     console.log(numRating);
 
@@ -445,7 +435,6 @@ app.post('/review/:nookID', upload.single('nookPhoto'), async (req, res) => {
     const routletStatus = req.body.outletCheck ? "Outlet available" : "No outlet";
     const rfoodStatus = req.body.foodCheck ? "Food available" : "No Food";
     const rcampusStatus = req.body.campusCheck ? "On-campus" : "Off-campus";
-
     let noise = req.body.noise;
 
     //database definitions
@@ -548,6 +537,10 @@ app.get('/edit/:nid/:rid', async (req, res) => {
  * Update database with edited review
  */
 app.post('/edit/:nid/:rid', async (req, res) => {
+    if (!req.session.username) {
+        req.flash('error', 'You are not logged in - please do so.');
+        return res.redirect("/");
+    }
     let nid = parseInt(req.params.nid);
     let rid = parseInt(req.params.rid);
     console.log('rid', rid);
@@ -611,6 +604,10 @@ app.post('/edit/:nid/:rid', async (req, res) => {
  * If there is a photo, it is deleted from uploads folder
  */
 app.post('/delete/:nid/:rid', async (req, res) => {
+    if (!req.session.username) {
+        req.flash('error', 'You are not logged in - please do so.');
+        return res.redirect("/");
+    }
     let nid = parseInt(req.params.nid);
     let rid = parseInt(req.params.rid);
 
@@ -677,7 +674,7 @@ app.get('/get-review/', async (req, res) => {
 })
 
 /**when users navigate to the map page, this route renders map.ejs passing the apikey
- * eventually it will also pass an array of all the titles and coordinates of nooks
+ * It will also pass an array of all the titles and coordinates of nooks
  * to be placed as markers on the map
  **/
 app.get('/map/', async (req, res) => {
@@ -687,13 +684,24 @@ app.get('/map/', async (req, res) => {
     }
     console.log('map view');
     const db = await Connection.open(mongoUri, DBNAME);
-    var allNooks = await db.collection(NOOKS).find({}).toArray();
-    var allNooks = allNooks.filter(nook => nook.latLng);
-    var allNooks = JSON.stringify(allNooks);
+    const aggregation = [
+    {
+        $match: {latLng: { $exists: true }}
+    },
+    {
+        $project: {
+        name: 1,
+        address: 1,
+        latLng: 1,
+        nid:1
+        }
+    }
+    ];
+const filteredNooks = await db.collection(NOOKS).aggregate(aggregation).toArray();
+const stringNooks = JSON.stringify(filteredNooks);
+console.log(stringNooks);
 
-    //allNooks = [allNooks.at(-1)];
-    console.log(allNooks);
-    return res.render('map.ejs', { apiKey: apiKey, allNooks: allNooks });
+    return res.render('map.ejs', { apiKey: apiKey, allNooks: stringNooks });
 });
 
 /**

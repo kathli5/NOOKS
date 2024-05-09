@@ -20,7 +20,9 @@
         </h1>
 
         <form id="review_form" method="POST" action="/review/<%= nook.nid %>" enctype="multipart/form-data">
-          <label for="nookRating" class="form-label">Rating </label>
+          <fieldset>
+            <label for="nookRating">
+            <legend>Rating</legend></label>
           <input type="range" name="nookRating" id="nookRating" class="form-range" min="0" max="5" step="1"
             list="steplist" required />
           <datalist id="steplist">
@@ -31,9 +33,11 @@
             <option>4</option>
             <option>5</option>
           </datalist>
+        </fieldset>
 
           <br>
-          <p>Tags</p>
+          <fieldset>
+          <legend>Tags</legend>
           <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" role="switch" value="wifi" id="wifi-check" name="wifiCheck">
             <label class="form-check-label" for="wifi-check">
@@ -62,25 +66,30 @@
           </div>
 
           <br>
-          <p>Noise Level</p>
+          <fieldset>
+          <legend>Noise Level</legend>
           <input type="radio" id="average" name="noise" value="Average noisiness" required>
-          <label for="quiet">Average Noisiness</label><br>
+          <label for="average">Average Noisiness</label><br>
           <input type="radio" id="quiet" name="noise" value="Usually quiet" required>
           <label for="quiet">Usually Quiet</label><br>
           <input type="radio" id="loud" name="noise" value="Usually loud">
           <label for="loud">Usually Loud</label><br>
-
+        </fieldset>
 
           <br>
+      
           <fieldset>
-            <label for="text">Add Review</label>
+            <label for="text"><legend>Add Review</legend></label>
             <textarea id="text" name="text" value="" class="form-control" placeholder="Add Review Here" required
               rows="3" cols="40"></textarea>
+          
           </fieldset>
-
           <br>
-          <label for="nookPhoto" class="form-label">Photo</label>
+          <fieldset>
+          <label><legend>Photo</legend>
           <input type="file" accept="image/*" name="nookPhoto" id="nookPhoto" class="form-control" />
+          </label>
+          </fieldset>
           <p><button type="submit" class="btn btn-primary mt-3 form-control">Submit</button></p>
         </form>
       </section>
