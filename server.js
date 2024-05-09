@@ -686,9 +686,7 @@ app.get('/map/', async (req, res) => {
     const db = await Connection.open(mongoUri, DBNAME);
     const aggregation = [
     {
-        $match: {
-        latLng: { $exists: true }
-        }
+        $match: {latLng: { $exists: true }}
     },
     {
         $project: {
