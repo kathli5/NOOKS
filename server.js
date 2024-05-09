@@ -684,13 +684,26 @@ app.get('/map/', async (req, res) => {
     }
     console.log('map view');
     const db = await Connection.open(mongoUri, DBNAME);
-    var allNooks = await db.collection(NOOKS).find({}).toArray();
-    var allNooks = allNooks.filter(nook => nook.latLng);
-    var allNooks = JSON.stringify(allNooks);
+    const aggregation = [
+    {
+        $match: {
+        latLng: { $exists: true }
+        }
+    },
+    {
+        $project: {
+        name: 1,
+        address: 1,
+        latLng: 1,
+        nid:1
+        }
+    }
+    ];
+const filteredNooks = await db.collection(NOOKS).aggregate(aggregation).toArray();
+const stringNooks = JSON.stringify(filteredNooks);
+console.log(stringNooks);
 
-    //allNooks = [allNooks.at(-1)];
-    console.log(allNooks);
-    return res.render('map.ejs', { apiKey: apiKey, allNooks: allNooks });
+    return res.render('map.ejs', { apiKey: apiKey, allNooks: stringNooks });
 });
 
 /**
